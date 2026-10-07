@@ -1,0 +1,39 @@
+<Window x:Class="RoboCopy_GUI_Kr.Agent.AgentQuarantineWindow" Style="{StaticResource AppWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:RoboCopy_GUI_Kr.Agent"
+        Title="{StaticResource QuarantineTitle}" Width="900" Height="520" MinWidth="700" MinHeight="380"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip">
+    <Grid Margin="12">
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="8" /><RowDefinition Height="*" /><RowDefinition Height="12" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+        <TextBlock Text="{StaticResource QuarantineInstruction}" TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}" />
+        <DataGrid x:Name="ItemsDataGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionMode="Extended" SelectionUnit="FullRow" CanUserAddRows="False"
+                  PreviewMouseRightButtonDown="ItemsDataGrid_PreviewMouseRightButtonDown">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{StaticResource RestoreOriginalLocation}" Click="Restore_Click" />
+                    <MenuItem Header="{StaticResource PermanentDelete}" Click="PermanentDelete_Click" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{StaticResource File}" Binding="{Binding FileName}" Width="190" />
+                <DataGridTemplateColumn Header="{StaticResource OriginalLocation}" Width="*"><DataGridTemplateColumn.CellTemplate><DataTemplate><local:AgentPathTextBlock FullPath="{Binding Item.OriginalDestinationPath}" Padding="4,0" HorizontalAlignment="Stretch" /></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+                <DataGridTextColumn Header="{StaticResource QuarantinedAt}" Binding="{Binding QuarantinedAtText}" Width="150" />
+                <DataGridTextColumn Header="{StaticResource Size}" Binding="{Binding SizeText}" Width="95">
+                    <DataGridTextColumn.HeaderStyle><Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"><Setter Property="HorizontalContentAlignment" Value="Right" /></Style></DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextAlignment" Value="Right" /><Setter Property="HorizontalAlignment" Value="Stretch" /></Style></DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="{StaticResource Byte}" Binding="{Binding ByteText}" Width="115">
+                    <DataGridTextColumn.HeaderStyle><Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}"><Setter Property="HorizontalContentAlignment" Value="Right" /></Style></DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextAlignment" Value="Right" /><Setter Property="HorizontalAlignment" Value="Stretch" /></Style></DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="{StaticResource RestoreOriginalLocation}" Click="Restore_Click" />
+            <Button Content="{StaticResource PermanentDelete}" Click="PermanentDelete_Click" />
+            <Button Content="{StaticResource Close}" Click="Close_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

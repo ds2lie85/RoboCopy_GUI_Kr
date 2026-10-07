@@ -1,0 +1,158 @@
+<Window x:Class="RoboCopy_GUI_Kr.ContinuousSyncSettingsWindow" Style="{StaticResource AppWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{StaticResource ContinuousSyncSettingsTitle}"
+        Width="760" Height="780" MinWidth="680" MinHeight="700"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="{StaticResource ContinuousSyncSettingsHeading}" Style="{StaticResource PageTitle}" />
+            <TextBlock Margin="0,6,0,0" Text="{StaticResource ContinuousSyncSettingsDescription}"
+                       TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{StaticResource SourceFolder}" Style="{StaticResource FieldLabel}" />
+                    <TextBox x:Name="SourceTextBox" Grid.Column="1" IsReadOnly="True" />
+                    <TextBlock Grid.Row="2" Text="{StaticResource DestinationFolder}" Style="{StaticResource FieldLabel}" />
+                    <TextBox x:Name="DestinationTextBox" Grid.Row="2" Grid.Column="1" IsReadOnly="True" />
+                </Grid>
+
+                <GroupBox Margin="0,10,0,0" Header="{StaticResource DestinationOnlyPolicyTitle}" Padding="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <RadioButton x:Name="DeleteDestinationOnlyRadioButton" GroupName="DestinationOnlyPolicy"
+                                     Content="{StaticResource DestinationOnlyDelete}" ToolTip="{StaticResource DestinationOnlyDeleteTooltip}" IsChecked="True" />
+                        <RadioButton x:Name="AllowDestinationOnlyRadioButton" Grid.Column="1" GroupName="DestinationOnlyPolicy"
+                                     Content="{StaticResource DestinationOnlyAllow}" ToolTip="{StaticResource DestinationOnlyAllowTooltip}" />
+                        <RadioButton x:Name="AskDestinationOnlyRadioButton" Grid.Column="2" GroupName="DestinationOnlyPolicy"
+                                     Content="{StaticResource DestinationOnlyAsk}" ToolTip="{StaticResource DestinationOnlyAskTooltip}" />
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Margin="0,10,0,0" Header="{StaticResource AgentCopyOptions}" Padding="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="10" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <CheckBox x:Name="IncludeEmptyCheckBox" Content="{StaticResource IncludeEmptyDirectories}" />
+                        <CheckBox x:Name="ExcludeZeroByteCheckBox" Grid.Column="1" Content="{StaticResource ExcludeZeroByte}" />
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <TextBlock Text="{StaticResource SymbolicLinkHandling}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                            <ComboBox x:Name="SymbolicLinkComboBox" Width="150" SelectedIndex="0">
+                                <ComboBoxItem Content="{StaticResource SymbolicExclude}" Tag="Exclude" />
+                                <ComboBoxItem Content="{StaticResource SymbolicCopyLink}" Tag="CopyLinkItself" />
+                                <ComboBoxItem Content="{StaticResource SymbolicFollowTarget}" Tag="FollowTarget" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                            <Button Content="{StaticResource Exclusions}" Click="Exclusions_Click" />
+                            <TextBlock x:Name="ExclusionSummaryTextBlock" Margin="8,0,0,0" VerticalAlignment="Center"
+                                       Foreground="{StaticResource SubtleTextBrush}" />
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Margin="0,10,0,0" Header="{StaticResource AgentRunConditions}" Padding="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="175" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" /><RowDefinition Height="6" /><RowDefinition Height="Auto" />
+                            <RowDefinition Height="6" /><RowDefinition Height="Auto" /><RowDefinition Height="6" />
+                            <RowDefinition Height="Auto" /><RowDefinition Height="6" /><RowDefinition Height="Auto" />
+                            <RowDefinition Height="6" /><RowDefinition Height="Auto" /><RowDefinition Height="6" />
+                            <RowDefinition Height="Auto" /><RowDefinition Height="6" /><RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{StaticResource SyncCycle}" Style="{StaticResource FieldLabel}" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <RadioButton x:Name="AlwaysScheduleRadioButton" GroupName="ScheduleMode" Content="{StaticResource SyncAlways}" IsChecked="True" />
+                            <RadioButton x:Name="ScheduledRadioButton" GroupName="ScheduleMode" Margin="24,0,0,0" Content="{StaticResource SyncScheduled}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="2" Text="{StaticResource MonitorIntervalMinutes}" Style="{StaticResource FieldLabel}" />
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                            <TextBox x:Name="IntervalTextBox" Width="90" Text="5" />
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Text="{StaticResource MonitorIntervalRange}" Foreground="{StaticResource SubtleTextBrush}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="4" Text="{StaticResource ScheduledHours}" Style="{StaticResource FieldLabel}" IsEnabled="{Binding IsChecked, ElementName=ScheduledRadioButton}" />
+                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" IsEnabled="{Binding IsChecked, ElementName=ScheduledRadioButton}">
+                            <TextBlock Text="{StaticResource ScheduleStart}" VerticalAlignment="Center" />
+                            <TextBox x:Name="ScheduleStartTextBox" Width="88" Margin="8,0" Text="00:00" HorizontalContentAlignment="Center" />
+                            <TextBlock Text="{StaticResource ScheduleEnd}" VerticalAlignment="Center" />
+                            <TextBox x:Name="ScheduleEndTextBox" Width="88" Margin="8,0" Text="00:00" HorizontalContentAlignment="Center" />
+                            <TextBlock Text="{StaticResource ScheduleHint}" VerticalAlignment="Center" Foreground="{StaticResource SubtleTextBrush}" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="6" Text="{StaticResource MultiThreadCount}" Style="{StaticResource FieldLabel}" />
+                        <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
+                            <ComboBox x:Name="MultiThreadComboBox" Width="190" SelectedIndex="0" IsEditable="True" IsTextSearchEnabled="False">
+                                <ComboBoxItem Tag="Recommended" />
+                                <ComboBoxItem Tag="MaximumPerformance" />
+                                <ComboBoxItem Content="1" Tag="1" /><ComboBoxItem Content="2" Tag="2" />
+                                <ComboBoxItem Content="4" Tag="4" /><ComboBoxItem Content="8" Tag="8" />
+                                <ComboBoxItem Content="16" Tag="16" /><ComboBoxItem Content="32" Tag="32" />
+                                <ComboBoxItem Content="64" Tag="64" /><ComboBoxItem Content="128" Tag="128" />
+                            </ComboBox>
+                            <Button x:Name="ReevaluateMtButton" Content="{StaticResource ReevaluateAutoMt}" Margin="8,0,0,0" Click="ReevaluateMt_Click">
+                                <Button.ContextMenu><ContextMenu><MenuItem Header="{StaticResource MtBenchmarkHistoryTitle}" Click="OpenMtBenchmarkHistory_Click" /></ContextMenu></Button.ContextMenu>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="8" Grid.Column="1" Text="{StaticResource AgentMtModeDescription}" TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}" />
+                        <StackPanel Grid.Row="10" Grid.Column="1">
+                            <ProgressBar x:Name="MtBenchmarkProgressBar" Height="8" Minimum="0" Maximum="100" Visibility="Collapsed" />
+                            <TextBlock x:Name="MtBenchmarkStatusTextBlock" Margin="0,4,0,0" Foreground="{StaticResource SubtleTextBrush}" />
+                        </StackPanel>
+                        <Grid Grid.Row="12" Grid.ColumnSpan="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="PauseOnBatteryCheckBox" Content="{StaticResource PauseOnBattery}" />
+                            <CheckBox x:Name="PauseOnMeteredCheckBox" Grid.Column="1" Content="{StaticResource PauseOnMetered}" />
+                            <CheckBox x:Name="QuarantineCheckBox" Grid.Column="2" IsChecked="True" Content="{StaticResource QuarantineSevenDays}" />
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+
+                <TextBlock Margin="0,10,0,0" Text="{StaticResource AgentAlwaysOptionsNotice}"
+                           TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}" />
+                <TextBlock Margin="0,6,0,0" Text="{StaticResource ContinuousSyncStartupNotice}"
+                           TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="{StaticResource Cancel}" IsCancel="True" />
+            <Button Content="{StaticResource StartRobocopyAgent}" IsDefault="True" Click="StartAgent_Click" Style="{StaticResource PrimaryButton}" />
+        </StackPanel>
+    </Grid>
+</Window>

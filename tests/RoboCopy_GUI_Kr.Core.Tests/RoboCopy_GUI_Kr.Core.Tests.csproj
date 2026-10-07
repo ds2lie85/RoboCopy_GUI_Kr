@@ -1,0 +1,193 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\installer\Copy-DistributionNotices.ps1"
+          Link="Fixtures\installer\Copy-DistributionNotices.ps1"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\LICENSE" Link="Fixtures\LICENSE" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\README.md" Link="Fixtures\README.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\THIRD_PARTY_NOTICES.md" Link="Fixtures\THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\App.xaml"
+          Link="Fixtures\MainApp.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\App.xaml"
+          Link="Fixtures\AgentApp.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\RoboCopy_GUI_Kr.Core\RoboCopy_GUI_Kr.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\src\RoboCopy_GUI_Kr\MainWindow.xaml"
+          Link="Fixtures\MainWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\PathTextBlock.cs"
+          Link="Fixtures\PathTextBlock.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentPathTextBlock.cs"
+          Link="Fixtures\AgentPathTextBlock.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\JobQueueWindow.xaml"
+          Link="Fixtures\JobQueueWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ContinuousSyncRegisteredTasksWindow.xaml"
+          Link="Fixtures\ContinuousSyncRegisteredTasksWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ContinuousSyncConflictWindow.xaml"
+          Link="Fixtures\ContinuousSyncConflictWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\MiniCopyWindow.xaml"
+          Link="Fixtures\MiniCopyWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\MiniCopyWindow.xaml.cs"
+          Link="Fixtures\MiniCopyWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ContinuousSyncWorkflow.cs"
+          Link="Fixtures\ContinuousSyncWorkflow.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ShellActionPromptWindow.xaml"
+          Link="Fixtures\ShellActionPromptWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ShellCopyConflictWindow.xaml"
+          Link="Fixtures\ShellCopyConflictWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ShellConflictScanProgressWindow.xaml"
+          Link="Fixtures\ShellConflictScanProgressWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ShellOverwriteSelectionWindow.xaml"
+          Link="Fixtures\ShellOverwriteSelectionWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\App.xaml.cs"
+          Link="Fixtures\App.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\MainWindow.xaml.cs"
+          Link="Fixtures\MainWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ExplorerContextMenuService.cs"
+          Link="Fixtures\ExplorerContextMenuService.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ExplorerIntegrationWindow.xaml"
+          Link="Fixtures\ExplorerIntegrationWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\MtBenchmarkHistoryWindow.xaml"
+          Link="Fixtures\MtBenchmarkHistoryWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ErrorFilesWindow.xaml"
+          Link="Fixtures\ErrorFilesWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\LockingProcessesWindow.xaml"
+          Link="Fixtures\LockingProcessesWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ForceTerminateWarningWindow.xaml"
+          Link="Fixtures\ForceTerminateWarningWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ExclusionWindow.xaml"
+          Link="Fixtures\ExclusionWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ExclusionWindow.xaml.cs"
+          Link="Fixtures\ExclusionWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\MoveFailureDecisionWindow.xaml"
+          Link="Fixtures\MoveFailureDecisionWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\OneWaySyncReviewWindow.xaml"
+          Link="Fixtures\OneWaySyncReviewWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ContinuousSyncSettingsWindow.xaml"
+          Link="Fixtures\ContinuousSyncSettingsWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\ContinuousSyncConflictWindow.xaml.cs"
+          Link="Fixtures\ContinuousSyncConflictWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentTaskEditorWindow.xaml"
+          Link="Fixtures\AgentTaskEditorWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\App.xaml.cs"
+          Link="Fixtures\AgentApp.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentNotificationListWindow.xaml"
+          Link="Fixtures\AgentNotificationListWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentNotificationListWindow.xaml.cs"
+          Link="Fixtures\AgentNotificationListWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentNotificationDetailWindow.xaml"
+          Link="Fixtures\AgentNotificationDetailWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentNotificationDetailWindow.xaml.cs"
+          Link="Fixtures\AgentNotificationDetailWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentSyncToastWindow.xaml"
+          Link="Fixtures\AgentSyncToastWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentSyncToastWindow.xaml.cs"
+          Link="Fixtures\AgentSyncToastWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentExclusionWindow.xaml"
+          Link="Fixtures\AgentExclusionWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentExclusionWindow.xaml.cs"
+          Link="Fixtures\AgentExclusionWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentReviewWindow.xaml"
+          Link="Fixtures\AgentReviewWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentQuarantineWindow.xaml"
+          Link="Fixtures\AgentQuarantineWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentRegisteredTasksWindow.xaml"
+          Link="Fixtures\AgentRegisteredTasksWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentTaskConflictWindow.xaml"
+          Link="Fixtures\AgentTaskConflictWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentErrorWindow.xaml"
+          Link="Fixtures\AgentErrorWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\AgentForceTerminateWarningWindow.xaml"
+          Link="Fixtures\AgentForceTerminateWarningWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr\Resources\Strings.ko-KR.xaml"
+          Link="Fixtures\MainStrings.ko-KR.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.Agent\Resources\Strings.ko-KR.xaml"
+          Link="Fixtures\AgentStrings.ko-KR.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.LockTestHelper\MainWindow.xaml"
+          Link="Fixtures\LockTestHelper.MainWindow.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.LockTestHelper\MainWindow.xaml.cs"
+          Link="Fixtures\LockTestHelper.MainWindow.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.LockTestHelper\App.xaml.cs"
+          Link="Fixtures\LockTestHelper.App.xaml.cs"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\src\RoboCopy_GUI_Kr.LockTestHelper\Resources\Strings.ko-KR.xaml"
+          Link="Fixtures\LockTestHelper.Strings.ko-KR.xaml"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\installer\Install.ps1"
+          Link="Fixtures\Install.ps1"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

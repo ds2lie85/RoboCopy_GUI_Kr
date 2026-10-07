@@ -1,0 +1,47 @@
+# Build output
+**/bin/
+**/obj/
+**/TestResults/
+artifacts/
+
+# Local SDK/NuGet state used by sandboxed builds
+.dotnet_cli/
+.dotnet-cli-home/
+.dotnet-home/
+.nuget/
+.dotnet/
+
+# IDE/user files
+.vs/
+*.user
+*.suo
+*.lnk
+
+# OS/editor temporary files
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*.old
+
+# Runtime data
+logs/
+*.log
+
+# Generated manual-test state / 수동 시험 생성 상태
+test-assets/**/.lock-process-id
+test-assets/**/.lock-ready
+test-assets/**/.release-lock
+test-assets/**/destination/
+test-assets/elevated-retry/source/
+
+# Local secrets and signing material / 로컬 비밀 정보 및 서명 자료
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+.aws/
+.codex/
+.agents/

@@ -1,0 +1,53 @@
+<Window x:Class="RoboCopy_GUI_Kr.LockTestHelper.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource WindowTitle}"
+        Width="760" Height="430" MinWidth="650" MinHeight="390"
+        WindowStartupLocation="CenterScreen" Background="#FFF7F7F7">
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock FontSize="22" FontWeight="Bold" Foreground="#FF8B1E1E"
+                   Text="{DynamicResource HeadingText}" />
+        <StackPanel Grid.Row="1" Margin="0,12,0,16">
+            <TextBlock TextWrapping="Wrap" FontSize="14" Text="{DynamicResource DescriptionText}" />
+            <Border Margin="0,12,0,0" Padding="10" Background="#FFFFE2E2" BorderBrush="#FFD9534F" BorderThickness="1">
+                <TextBlock TextWrapping="Wrap" Foreground="#FF8B1E1E" FontWeight="SemiBold"
+                           Text="{DynamicResource SafetyText}" />
+            </Border>
+        </StackPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="145" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" FontWeight="SemiBold" Text="{DynamicResource ProcessIdLabel}" />
+            <TextBlock x:Name="ProcessIdText" Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" />
+            <TextBlock Grid.Row="1" Margin="0,12,0,0" FontWeight="SemiBold" Text="{DynamicResource SourceFolderLabel}" />
+            <TextBox x:Name="SourceFolderText" Grid.Row="1" Grid.Column="1" Margin="0,7,0,0" IsReadOnly="True" />
+            <TextBlock Grid.Row="2" Margin="0,12,0,0" FontWeight="SemiBold" Text="{DynamicResource DestinationFolderLabel}" />
+            <TextBox x:Name="DestinationFolderText" Grid.Row="2" Grid.Column="1" Margin="0,7,0,0" IsReadOnly="True" />
+            <TextBlock Grid.Row="3" Margin="0,12,0,0" FontWeight="SemiBold" Text="{DynamicResource LockedFileLabel}" />
+            <TextBox x:Name="LockedFileText" Grid.Row="3" Grid.Column="1" Margin="0,7,0,0" IsReadOnly="True" />
+            <TextBlock x:Name="CloseStatusText" Grid.Row="4" Grid.ColumnSpan="2" Margin="0,16,0,0"
+                       Foreground="#FF8B1E1E" FontWeight="SemiBold" TextWrapping="Wrap" />
+        </Grid>
+        <DockPanel Grid.Row="3" Margin="0,18,0,0">
+            <TextBlock x:Name="RemainingTimeText" VerticalAlignment="Center" Foreground="#FF59636E" />
+            <Button DockPanel.Dock="Right" Margin="12,0,0,0" Padding="16,7" MinWidth="160"
+                    FontWeight="SemiBold" Click="ReleaseAndExitButton_Click"
+                    Content="{DynamicResource ReleaseAndExitButton}" />
+        </DockPanel>
+    </Grid>
+</Window>

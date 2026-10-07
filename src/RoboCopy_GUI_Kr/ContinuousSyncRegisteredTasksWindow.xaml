@@ -1,0 +1,28 @@
+<Window x:Class="RoboCopy_GUI_Kr.ContinuousSyncRegisteredTasksWindow" Style="{StaticResource AppWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:RoboCopy_GUI_Kr"
+        Title="{DynamicResource ContinuousSyncRegisteredTitle}"
+        Width="920" Height="430" MinWidth="760" MinHeight="340"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip">
+    <Grid Margin="16">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="{DynamicResource ContinuousSyncRegisteredDescription}" TextWrapping="Wrap" Margin="0,0,0,12" />
+        <DataGrid x:Name="TaskGrid" Grid.Row="1" ItemsSource="{Binding Rows}" AutoGenerateColumns="False"
+                  CanUserAddRows="False" SelectionMode="Extended" GridLinesVisibility="None" PreviewMouseRightButtonDown="Grid_PreviewMouseRightButtonDown">
+            <DataGrid.ContextMenu>
+                <ContextMenu><MenuItem Header="{DynamicResource Delete}" Click="DeleteSelected_Click" /></ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn ElementStyle="{StaticResource GridCheckBoxStyle}" EditingElementStyle="{StaticResource GridCheckBoxEditingStyle}" Header="{DynamicResource Select}" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="58" />
+                <DataGridTemplateColumn Header="{DynamicResource SourceFolder}" Width="*" IsReadOnly="True"><DataGridTemplateColumn.CellTemplate><DataTemplate><local:PathTextBlock FullPath="{Binding Source}" Padding="4,0" HorizontalAlignment="Stretch" /></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{DynamicResource DestinationFolder}" Width="*" IsReadOnly="True"><DataGridTemplateColumn.CellTemplate><DataTemplate><local:PathTextBlock FullPath="{Binding Destination}" Padding="4,0" HorizontalAlignment="Stretch" /></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+                <DataGridTextColumn Header="{DynamicResource ContinuousSyncInterval}" Binding="{Binding Interval}" Width="110" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="{DynamicResource DeleteSelected}" Click="DeleteSelected_Click" />
+            <Button Content="{DynamicResource Close}" IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</Window>

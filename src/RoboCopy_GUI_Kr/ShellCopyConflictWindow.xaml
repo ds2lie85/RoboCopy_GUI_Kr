@@ -1,0 +1,80 @@
+<Window x:Class="RoboCopy_GUI_Kr.ShellCopyConflictWindow" Style="{StaticResource AppWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:RoboCopy_GUI_Kr"
+        Title="{StaticResource ShellCopyConflictTitle}"
+        Width="1040" Height="650" MinWidth="800" MinHeight="480"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="12" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock Text="{StaticResource ShellCopyConflictHeading}" Style="{StaticResource PageTitle}" />
+            <TextBlock Margin="0,7,0,0" Text="{StaticResource ShellCopyConflictGroupedInstruction}"
+                       TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}" />
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Content="{StaticResource SkipAll}" Click="SkipAll_Click" />
+            <Button Content="{StaticResource OverwriteAll}" Click="OverwriteAll_Click" />
+            <Button Content="{StaticResource KeepBothAll}" Click="KeepBothAll_Click" />
+        </StackPanel>
+        <Border Grid.Row="4" BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1" Background="{StaticResource PanelBrush}" CornerRadius="12" Padding="4">
+            <TreeView x:Name="ConflictTreeView" ItemsSource="{Binding Rows}"
+                      VirtualizingStackPanel.IsVirtualizing="True"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type local:ShellConflictGroupRow}" ItemsSource="{Binding Files}">
+                        <Grid Margin="2,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" MinWidth="160" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="2*" MinWidth="180" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Text="{Binding CountText}" />
+                            <TextBlock Grid.Column="2" Text="{Binding ConflictType}" Foreground="{StaticResource SubtleTextBrush}" />
+                            <ComboBox Grid.Column="3" ItemsSource="{Binding DecisionOptions}"
+                                      DisplayMemberPath="Label" SelectedValuePath="Decision"
+                                      SelectedValue="{Binding Decision, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type local:ShellConflictFileRow}">
+                        <Grid Margin="24,5,2,7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="92" />
+                                <ColumnDefinition Width="86" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="110" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.RowSpan="2" Text="{Binding Kind}" Foreground="{StaticResource SubtleTextBrush}"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding SourceLabel}" FontWeight="SemiBold" />
+                            <local:PathTextBlock Grid.Column="2" FullPath="{Binding SourcePath}" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DestinationLabel}" FontWeight="SemiBold" />
+                            <local:PathTextBlock Grid.Row="1" Grid.Column="2" FullPath="{Binding DestinationPath}" />
+                            <TextBlock Grid.Column="3" Grid.RowSpan="2" Text="{Binding SizeText}" TextAlignment="Right"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+        </Border>
+        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="{StaticResource Cancel}" IsCancel="True" />
+            <Button Content="{StaticResource ApplySelection}" IsDefault="True" Click="Apply_Click" Style="{StaticResource PrimaryButton}" />
+        </StackPanel>
+    </Grid>
+</Window>

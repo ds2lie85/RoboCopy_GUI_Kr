@@ -1,0 +1,47 @@
+<Window x:Class="RoboCopy_GUI_Kr.LockingProcessesWindow" Style="{StaticResource AppWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{StaticResource LockingProcessesTitle}"
+        Width="620" Height="360" MinWidth="480" MinHeight="280"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="16">
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="12"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <DataGrid ItemsSource="{Binding}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{StaticResource RequestNormalShutdown}" Click="RequestShutdown_Click" />
+                    <MenuItem x:Name="ForceTerminateMenuItem" Header="{StaticResource ForceTerminate}" Click="ForceTerminate_Click" Visibility="Collapsed" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{StaticResource ApplicationName}" Binding="{Binding ApplicationName}" Width="*" />
+                <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="90" />
+                <DataGridTextColumn Header="{StaticResource ServiceName}" Binding="{Binding ServiceName}" Width="150" />
+                <DataGridCheckBoxColumn Binding="{Binding IsRestartable}" Width="150">
+                    <DataGridCheckBoxColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{StaticResource RestartableProcess}" ToolTip="{StaticResource RestartableProcessTooltip}"
+                                       TextWrapping="Wrap" TextAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridCheckBoxColumn.HeaderTemplate>
+                    <DataGridCheckBoxColumn.ElementStyle>
+                        <Style TargetType="CheckBox" BasedOn="{StaticResource GridCheckBoxStyle}">
+                            <Setter Property="ToolTip" Value="{StaticResource RestartableProcessTooltip}" />
+                        </Style>
+                    </DataGridCheckBoxColumn.ElementStyle>
+                    <DataGridCheckBoxColumn.EditingElementStyle>
+                        <Style TargetType="CheckBox" BasedOn="{StaticResource GridCheckBoxEditingStyle}">
+                            <Setter Property="ToolTip" Value="{StaticResource RestartableProcessTooltip}" />
+                        </Style>
+                    </DataGridCheckBoxColumn.EditingElementStyle>
+                </DataGridCheckBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button x:Name="RequestShutdownButton" Content="{StaticResource RequestNormalShutdown}" Click="RequestShutdown_Click" />
+            <Button x:Name="ForceTerminateButton" Content="{StaticResource ForceTerminate}" Click="ForceTerminate_Click"
+                    Visibility="Collapsed" Style="{StaticResource DangerButton}" />
+            <Button Content="{StaticResource Close}" IsCancel="True" Click="Close_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

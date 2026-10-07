@@ -1,0 +1,21 @@
+<Window x:Class="RoboCopy_GUI_Kr.Agent.AgentExclusionWindow" Style="{StaticResource AppWindow}" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:RoboCopy_GUI_Kr.Agent" Title="{StaticResource ExclusionWindowTitle}" Width="860" Height="700" MinWidth="700" MinHeight="500" WindowStartupLocation="CenterOwner">
+ <Grid Margin="18">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="*"/><RowDefinition Height="14"/><RowDefinition Height="190"/><RowDefinition Height="16"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <TextBlock Text="{StaticResource ExclusionTreeInstruction}" TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}"/>
+  <Border Grid.Row="2" Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="8">
+   <TreeView x:Name="FileTreeView" ItemsSource="{Binding RootNodes}"><TreeView.Resources>
+    <HierarchicalDataTemplate DataType="{x:Type local:AgentExclusionTreeNode}" ItemsSource="{Binding Children}"><CheckBox Content="{Binding Name}" ToolTip="{Binding FullPath}" IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsEnabled}"/></HierarchicalDataTemplate>
+    <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}"><Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/><EventSetter Event="Expanded" Handler="TreeItem_Expanded"/></Style>
+   </TreeView.Resources></TreeView>
+  </Border>
+  <GroupBox Grid.Row="4" Header="{StaticResource ExcludedPatterns}" Padding="10"><Grid>
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="300"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="8"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+   <TextBox x:Name="PatternTextBox" ToolTip="{StaticResource FileExample}"/><Button Grid.Column="1" Content="{StaticResource AddPattern}" Click="AddPattern_Click"/>
+   <StackPanel Grid.Column="2" Margin="14,0,8,0" Orientation="Horizontal" VerticalAlignment="Center"><TextBlock Text="{StaticResource PatternExamplePrefix}" Margin="0,0,4,0"/><ToggleButton x:Name="TmpPatternToggle" Content="{StaticResource TmpPattern}" Tag="*.tmp" Checked="CommonPattern_Changed" Unchecked="CommonPattern_Changed"/><TextBlock Text="," Margin="2,0"/><ToggleButton x:Name="BakPatternToggle" Content="{StaticResource BakPattern}" Tag="*.bak" Checked="CommonPattern_Changed" Unchecked="CommonPattern_Changed"/><TextBlock Text="," Margin="2,0"/><ToggleButton x:Name="ThumbsPatternToggle" Content="{StaticResource ThumbsPattern}" Tag="Thumbs.db" Checked="CommonPattern_Changed" Unchecked="CommonPattern_Changed"/></StackPanel>
+   <Button Grid.Column="3" Content="{StaticResource RemoveSelected}" Click="RemovePatterns_Click"/>
+   <ListBox x:Name="PatternListBox" Grid.Row="2" Grid.ColumnSpan="4" MinHeight="100" SelectionMode="Extended" PreviewMouseLeftButtonDown="PatternListBox_PreviewMouseLeftButtonDown" PreviewMouseMove="PatternListBox_PreviewMouseMove" PreviewMouseLeftButtonUp="PatternListBox_PreviewMouseLeftButtonUp" PreviewMouseRightButtonDown="PatternListBox_PreviewMouseRightButtonDown"><ListBox.ContextMenu><ContextMenu><MenuItem Header="{StaticResource RemoveSelected}" Click="RemovePatterns_Click"/></ContextMenu></ListBox.ContextMenu></ListBox>
+  </Grid></GroupBox>
+  <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="{StaticResource Cancel}" IsCancel="True"/><Button Content="{StaticResource Save}" IsDefault="True" Click="Save_Click" Style="{StaticResource PrimaryButton}"/></StackPanel>
+ </Grid>
+</Window>

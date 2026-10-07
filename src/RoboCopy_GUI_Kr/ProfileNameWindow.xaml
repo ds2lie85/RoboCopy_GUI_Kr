@@ -1,0 +1,23 @@
+<Window x:Class="RoboCopy_GUI_Kr.ProfileNameWindow" Style="{StaticResource AppWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{StaticResource ProfileNameTitle}"
+        Width="420" Height="190" MinWidth="360" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="{StaticResource ProfileNamePrompt}" />
+        <TextBox x:Name="ProfileNameTextBox" Grid.Row="2" MaxLength="80" />
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="{StaticResource SaveProfile}" IsDefault="True" Click="Save_Click" />
+            <Button Content="{StaticResource Cancel}" IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</Window>
+

@@ -1,0 +1,15 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <sys:String x:Key="WindowTitle">RoboCopy 강제 종료 시험 도우미</sys:String>
+    <sys:String x:Key="HeadingText">시험 파일을 독점 점유하고 있습니다</sys:String>
+    <sys:String x:Key="DescriptionText">이 도우미는 안전 종료 요청을 의도적으로 거부합니다. RoboCopy 오류 파일 창에서 안전 종료 실패 후 강제 종료 버튼이 나타나는지 확인하세요.</sys:String>
+    <sys:String x:Key="SafetyText">시험 전용 임시 파일만 사용합니다. 10분이 지나면 잠금을 자동으로 해제하고 종료합니다.</sys:String>
+    <sys:String x:Key="ProcessIdLabel">프로세스 ID</sys:String>
+    <sys:String x:Key="SourceFolderLabel">RoboCopy 원본 폴더</sys:String>
+    <sys:String x:Key="DestinationFolderLabel">RoboCopy 대상 폴더</sys:String>
+    <sys:String x:Key="LockedFileLabel">점유 중인 파일</sys:String>
+    <sys:String x:Key="RemainingTimeFormat">자동 종료까지 {0:mm\:ss}</sys:String>
+    <sys:String x:Key="CloseRejectedText">일반 닫기 요청을 거부했습니다. 아래 버튼으로 안전하게 종료하세요.</sys:String>
+    <sys:String x:Key="ReleaseAndExitButton">잠금 해제 후 종료</sys:String>
+</ResourceDictionary>

@@ -1,0 +1,27 @@
+<Window x:Class="RoboCopy_GUI_Kr.MoveFailureDecisionWindow" Style="{StaticResource AppWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{DynamicResource MoveErrorPolicyTitle}"
+        Width="760" Height="310" MinWidth="680" MinHeight="290"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Style="{StaticResource PageTitle}"
+                   Text="{DynamicResource MoveErrorPolicyHeading}" />
+        <TextBlock x:Name="DescriptionTextBlock" Grid.Row="1" Margin="0,16,0,18" TextWrapping="Wrap" />
+        <UniformGrid Grid.Row="2" Rows="1" Columns="4">
+            <Button Content="{DynamicResource MoveErrorContinueButton}" ToolTip="{DynamicResource MoveErrorYesTooltip}"
+                    Click="MoveFirst_Click" />
+            <Button Content="{DynamicResource MoveErrorResolveButton}" ToolTip="{DynamicResource MoveErrorNoTooltip}"
+                    Click="Defer_Click" />
+            <Button Content="{DynamicResource MoveErrorStopButton}" ToolTip="{DynamicResource MoveErrorStopTooltip}"
+                    Click="Stop_Click" />
+            <Button Content="{DynamicResource Delete}" ToolTip="{DynamicResource MoveErrorDeleteTooltip}"
+                    Click="Delete_Click" Style="{StaticResource DangerSoftButton}" />
+        </UniformGrid>
+    </Grid>
+</Window>

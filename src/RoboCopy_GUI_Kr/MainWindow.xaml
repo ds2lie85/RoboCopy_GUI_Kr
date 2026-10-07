@@ -1,0 +1,453 @@
+<Window x:Class="RoboCopy_GUI_Kr.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:RoboCopy_GUI_Kr"
+        Title="{StaticResource AppTitle}"
+        Width="1080"
+        Height="880"
+        MinWidth="920"
+        MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource AppWindow}"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 헤더 -->
+        <Border Grid.Row="0" Background="{StaticResource HeaderBrush}" BorderBrush="{StaticResource CardBorderBrush}"
+                BorderThickness="0,0,0,1" Padding="24,16,20,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Rectangle x:Name="DigitalRhythmVisualLegacy" Grid.ColumnSpan="3" Height="54" Visibility="Collapsed"
+                           Margin="335,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                           IsHitTestVisible="False" Opacity="0.58">
+                    <Rectangle.Fill>
+                        <DrawingBrush TileMode="Tile" Viewport="0,0,224,54" ViewportUnits="Absolute"
+                                      Viewbox="0,0,224,54" ViewboxUnits="Absolute" Stretch="None">
+                            <DrawingBrush.Drawing>
+                                <GeometryDrawing Brush="White" Geometry="M0,44 H5 V49 H0 Z M7,44 H12 V49 H7 Z M7,37 H12 V42 H7 Z M14,44 H19 V49 H14 Z M14,37 H19 V42 H14 Z M21,44 H26 V49 H21 Z M21,37 H26 V42 H21 Z M21,30 H26 V35 H21 Z M28,44 H33 V49 H28 Z M28,37 H33 V42 H28 Z M28,30 H33 V35 H28 Z M28,23 H33 V28 H28 Z M35,44 H40 V49 H35 Z M35,37 H40 V42 H35 Z M35,30 H40 V35 H35 Z M35,23 H40 V28 H35 Z M35,16 H40 V21 H35 Z M35,9 H40 V14 H35 Z M42,44 H47 V49 H42 Z M42,37 H47 V42 H42 Z M42,30 H47 V35 H42 Z M42,23 H47 V28 H42 Z M42,16 H47 V21 H42 Z M42,9 H47 V14 H42 Z M42,2 H47 V7 H42 Z M49,44 H54 V49 H49 Z M49,37 H54 V42 H49 Z M49,30 H54 V35 H49 Z M49,23 H54 V28 H49 Z M49,16 H54 V21 H49 Z M49,9 H54 V14 H49 Z M56,44 H61 V49 H56 Z M56,37 H61 V42 H56 Z M56,30 H61 V35 H56 Z M56,23 H61 V28 H56 Z M56,16 H61 V21 H56 Z M63,44 H68 V49 H63 Z M63,37 H68 V42 H63 Z M63,30 H68 V35 H63 Z M63,23 H68 V28 H63 Z M70,44 H75 V49 H70 Z M70,37 H75 V42 H70 Z M70,30 H75 V35 H70 Z M77,44 H82 V49 H77 Z M77,37 H82 V42 H77 Z M84,44 H89 V49 H84 Z M84,37 H89 V42 H84 Z M91,44 H96 V49 H91 Z M98,44 H103 V49 H98 Z M105,44 H110 V49 H105 Z M105,37 H110 V42 H105 Z M112,44 H117 V49 H112 Z M112,37 H117 V42 H112 Z M112,30 H117 V35 H112 Z M119,44 H124 V49 H119 Z M119,37 H124 V42 H119 Z M119,30 H124 V35 H119 Z M119,23 H124 V28 H119 Z M126,44 H131 V49 H126 Z M126,37 H131 V42 H126 Z M126,30 H131 V35 H126 Z M126,23 H131 V28 H126 Z M133,44 H138 V49 H133 Z M133,37 H138 V42 H133 Z M133,30 H138 V35 H133 Z M140,44 H145 V49 H140 Z M140,37 H145 V42 H140 Z M147,44 H152 V49 H147 Z M154,44 H159 V49 H154 Z M154,37 H159 V42 H154 Z M161,44 H166 V49 H161 Z M161,37 H166 V42 H161 Z M161,30 H166 V35 H161 Z M168,44 H173 V49 H168 Z M168,37 H173 V42 H168 Z M168,30 H173 V35 H168 Z M168,23 H173 V28 H168 Z M168,16 H173 V21 H168 Z M175,44 H180 V49 H175 Z M175,37 H180 V42 H175 Z M175,30 H180 V35 H175 Z M175,23 H180 V28 H175 Z M175,16 H180 V21 H175 Z M175,9 H180 V14 H175 Z M182,44 H187 V49 H182 Z M182,37 H187 V42 H182 Z M182,30 H187 V35 H182 Z M182,23 H187 V28 H182 Z M189,44 H194 V49 H189 Z M189,37 H194 V42 H189 Z M189,30 H194 V35 H189 Z M196,44 H201 V49 H196 Z M196,37 H201 V42 H196 Z M203,44 H208 V49 H203 Z M203,37 H208 V42 H203 Z M203,30 H208 V35 H203 Z M210,44 H215 V49 H210 Z M210,37 H215 V42 H210 Z M210,30 H215 V35 H210 Z M210,23 H215 V28 H210 Z M217,44 H222 V49 H217 Z M217,37 H222 V42 H217 Z M217,30 H222 V35 H217 Z M217,23 H222 V28 H217 Z M217,16 H222 V21 H217 Z M217,9 H222 V14 H217 Z" />
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Viewbox x:Name="DigitalRhythmVisual" Grid.ColumnSpan="3" Height="54"
+                         Margin="335,0,-20,-16" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+                         Stretch="Fill" IsHitTestVisible="False" Opacity="0.64">
+                    <Canvas Width="675" Height="54">
+                        <Path Fill="White" Data="M0,47 H7 V54 H0 Z M9,47 H16 V54 H9 Z M9,38 H16 V45 H9 Z M18,47 H25 V54 H18 Z M18,38 H25 V45 H18 Z M18,29 H25 V36 H18 Z M27,47 H34 V54 H27 Z M27,38 H34 V45 H27 Z M27,29 H34 V36 H27 Z M36,47 H43 V54 H36 Z M36,38 H43 V45 H36 Z M45,47 H52 V54 H45 Z M45,38 H52 V45 H45 Z M54,47 H61 V54 H54 Z M63,47 H70 V54 H63 Z M72,47 H79 V54 H72 Z M81,47 H88 V54 H81 Z M81,38 H88 V45 H81 Z M90,47 H97 V54 H90 Z M90,38 H97 V45 H90 Z M90,29 H97 V36 H90 Z M99,47 H106 V54 H99 Z M99,38 H106 V45 H99 Z M99,29 H106 V36 H99 Z M99,20 H106 V27 H99 Z M99,11 H106 V18 H99 Z M108,47 H115 V54 H108 Z M108,38 H115 V45 H108 Z M108,29 H115 V36 H108 Z M108,20 H115 V27 H108 Z M108,11 H115 V18 H108 Z M108,2 H115 V9 H108 Z M117,47 H124 V54 H117 Z M117,38 H124 V45 H117 Z M117,29 H124 V36 H117 Z M117,20 H124 V27 H117 Z M117,11 H124 V18 H117 Z M126,47 H133 V54 H126 Z M126,38 H133 V45 H126 Z M126,29 H133 V36 H126 Z M126,20 H133 V27 H126 Z M135,47 H142 V54 H135 Z M135,38 H142 V45 H135 Z M135,29 H142 V36 H135 Z M144,47 H151 V54 H144 Z M144,38 H151 V45 H144 Z M153,47 H160 V54 H153 Z M162,47 H169 V54 H162 Z M171,47 H178 V54 H171 Z M171,38 H178 V45 H171 Z M180,47 H187 V54 H180 Z M180,38 H187 V45 H180 Z M180,29 H187 V36 H180 Z M189,47 H196 V54 H189 Z M189,38 H196 V45 H189 Z M189,29 H196 V36 H189 Z M189,20 H196 V27 H189 Z M198,47 H205 V54 H198 Z M198,38 H205 V45 H198 Z M198,29 H205 V36 H198 Z M198,20 H205 V27 H198 Z M198,11 H205 V18 H198 Z M198,2 H205 V9 H198 Z M207,47 H214 V54 H207 Z M207,38 H214 V45 H207 Z M207,29 H214 V36 H207 Z M216,47 H223 V54 H216 Z M216,38 H223 V45 H216 Z M225,47 H232 V54 H225 Z M234,47 H241 V54 H234 Z M234,38 H241 V45 H234 Z M243,47 H250 V54 H243 Z M243,38 H250 V45 H243 Z M243,29 H250 V36 H243 Z M252,47 H259 V54 H252 Z M252,38 H259 V45 H252 Z M252,29 H259 V36 H252 Z M252,20 H259 V27 H252 Z M252,11 H259 V18 H252 Z M261,47 H268 V54 H261 Z M261,38 H268 V45 H261 Z M261,29 H268 V36 H261 Z M261,20 H268 V27 H261 Z M261,11 H268 V18 H261 Z M261,2 H268 V9 H261 Z M270,47 H277 V54 H270 Z M270,38 H277 V45 H270 Z M270,29 H277 V36 H270 Z M270,20 H277 V27 H270 Z M270,11 H277 V18 H270 Z M270,2 H277 V9 H270 Z M279,47 H286 V54 H279 Z M279,38 H286 V45 H279 Z M279,29 H286 V36 H279 Z M279,20 H286 V27 H279 Z M279,11 H286 V18 H279 Z M288,47 H295 V54 H288 Z M288,38 H295 V45 H288 Z M288,29 H295 V36 H288 Z M288,20 H295 V27 H288 Z M297,47 H304 V54 H297 Z M297,38 H304 V45 H297 Z M297,29 H304 V36 H297 Z M306,47 H313 V54 H306 Z M306,38 H313 V45 H306 Z M315,47 H322 V54 H315 Z M324,47 H331 V54 H324 Z M333,47 H340 V54 H333 Z M342,47 H349 V54 H342 Z M351,47 H358 V54 H351 Z M351,38 H358 V45 H351 Z M360,47 H367 V54 H360 Z M360,38 H367 V45 H360 Z M360,29 H367 V36 H360 Z M369,47 H376 V54 H369 Z M369,38 H376 V45 H369 Z M369,29 H376 V36 H369 Z M369,20 H376 V27 H369 Z M378,47 H385 V54 H378 Z M378,38 H385 V45 H378 Z M378,29 H385 V36 H378 Z M378,20 H385 V27 H378 Z M387,47 H394 V54 H387 Z M387,38 H394 V45 H387 Z M387,29 H394 V36 H387 Z M396,47 H403 V54 H396 Z M396,38 H403 V45 H396 Z M405,47 H412 V54 H405 Z M414,47 H421 V54 H414 Z M423,47 H430 V54 H423 Z M432,47 H439 V54 H432 Z M432,38 H439 V45 H432 Z M441,47 H448 V54 H441 Z M441,38 H448 V45 H441 Z M441,29 H448 V36 H441 Z M441,20 H448 V27 H441 Z M450,47 H457 V54 H450 Z M450,38 H457 V45 H450 Z M450,29 H457 V36 H450 Z M450,20 H457 V27 H450 Z M450,11 H457 V18 H450 Z M450,2 H457 V9 H450 Z M459,47 H466 V54 H459 Z M459,38 H466 V45 H459 Z M459,29 H466 V36 H459 Z M459,20 H466 V27 H459 Z M459,11 H466 V18 H459 Z M468,47 H475 V54 H468 Z M468,38 H475 V45 H468 Z M468,29 H475 V36 H468 Z M468,20 H475 V27 H468 Z M477,47 H484 V54 H477 Z M477,38 H484 V45 H477 Z M477,29 H484 V36 H477 Z M486,47 H493 V54 H486 Z M486,38 H493 V45 H486 Z M495,47 H502 V54 H495 Z M495,38 H502 V45 H495 Z M504,47 H511 V54 H504 Z M504,38 H511 V45 H504 Z M504,29 H511 V36 H504 Z M513,47 H520 V54 H513 Z M513,38 H520 V45 H513 Z M513,29 H520 V36 H513 Z M513,20 H520 V27 H513 Z M513,11 H520 V18 H513 Z M522,47 H529 V54 H522 Z M522,38 H529 V45 H522 Z M522,29 H529 V36 H522 Z M522,20 H529 V27 H522 Z M522,11 H529 V18 H522 Z M522,2 H529 V9 H522 Z M531,47 H538 V54 H531 Z M540,47 H547 V54 H540 Z M549,47 H556 V54 H549 Z M549,38 H556 V45 H549 Z M558,47 H565 V54 H558 Z M558,38 H565 V45 H558 Z M558,29 H565 V36 H558 Z M567,47 H574 V54 H567 Z M567,38 H574 V45 H567 Z M567,29 H574 V36 H567 Z M567,20 H574 V27 H567 Z M567,11 H574 V18 H567 Z M576,47 H583 V54 H576 Z M576,38 H583 V45 H576 Z M576,29 H583 V36 H576 Z M576,20 H583 V27 H576 Z M576,11 H583 V18 H576 Z M576,2 H583 V9 H576 Z M585,47 H592 V54 H585 Z M585,38 H592 V45 H585 Z M585,29 H592 V36 H585 Z M585,20 H592 V27 H585 Z M585,11 H592 V18 H585 Z M585,2 H592 V9 H585 Z M594,47 H601 V54 H594 Z M594,38 H601 V45 H594 Z M594,29 H601 V36 H594 Z M594,20 H601 V27 H594 Z M594,11 H601 V18 H594 Z M603,47 H610 V54 H603 Z M603,38 H610 V45 H603 Z M603,29 H610 V36 H603 Z" />
+                        <Path x:Name="DigitalRhythmEndingRise" Fill="White" Data="M612,47 H619 V54 H612 Z M621,47 H628 V54 H621 Z M621,38 H628 V45 H621 Z M630,47 H637 V54 H630 Z M630,38 H637 V45 H630 Z M630,29 H637 V36 H630 Z M639,47 H646 V54 H639 Z M639,38 H646 V45 H639 Z M639,29 H646 V36 H639 Z M639,20 H646 V27 H639 Z M648,47 H655 V54 H648 Z M648,38 H655 V45 H648 Z M648,29 H655 V36 H648 Z M648,20 H655 V27 H648 Z M648,11 H655 V18 H648 Z M657,47 H664 V54 H657 Z M657,38 H664 V45 H657 Z M657,29 H664 V36 H657 Z M657,20 H664 V27 H657 Z M657,11 H664 V18 H657 Z M657,2 H664 V9 H657 Z M666,47 H673 V54 H666 Z M666,38 H673 V45 H666 Z M666,29 H673 V36 H666 Z M666,20 H673 V27 H666 Z M666,11 H673 V18 H666 Z M666,2 H673 V9 H666 Z" />
+                    </Canvas>
+                </Viewbox>
+                <Border Width="46" Height="46" CornerRadius="14" Background="{StaticResource AccentGradientBrush}"
+                        VerticalAlignment="Center">
+                    <Viewbox Width="26" Height="26">
+                        <Canvas Width="28" Height="28">
+                            <Path Data="M5,9 L22,9 M17.5,4.5 L22,9 L17.5,13.5" Stroke="White" StrokeThickness="2.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                            <Path Data="M23,19 L6,19 M10.5,14.5 L6,19 L10.5,23.5" Stroke="White" StrokeThickness="2.2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Opacity="0.85" />
+                        </Canvas>
+                    </Viewbox>
+                </Border>
+                <StackPanel Grid.Column="1" Margin="16,0,16,0" VerticalAlignment="Center">
+                    <TextBlock Text="{StaticResource AppTitle}" Foreground="#102A56"
+                               FontSize="22" FontWeight="SemiBold" />
+                    <TextBlock Text="{StaticResource HeaderSubtitle}" Margin="0,3,0,0"
+                               Foreground="#3B5F8C" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <Button x:Name="MiniUiButton" Content="{StaticResource MiniUi}" Style="{StaticResource GhostButton}"
+                            Foreground="White" Background="#B31D4ED8" BorderBrush="#D9FFFFFF" FontWeight="SemiBold"
+                            Click="MiniUi_Click" />
+                    <Button x:Name="ExplorerIntegrationButton" Content="{StaticResource ExplorerIntegration}"
+                            Style="{StaticResource GhostButton}" Margin="8,0,0,0"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Foreground="White" Background="#B31D4ED8" BorderBrush="#D9FFFFFF" FontWeight="SemiBold"
+                            Click="ExplorerIntegration_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 작업 설정 카드 -->
+        <Border Grid.Row="1" Margin="16,16,16,8" Padding="20,18" Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1" CornerRadius="16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="112" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="14" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{StaticResource SourceFolder}" Style="{StaticResource FieldLabel}" />
+                <TextBox x:Name="SourceTextBox" Grid.Row="0" Grid.Column="1" TextChanged="CopyPath_TextChanged" />
+                <Button Grid.Row="0" Grid.Column="2" Content="{StaticResource Browse}" MinWidth="72" Margin="8,0,0,0" Click="BrowseSource_Click" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{StaticResource DestinationFolder}" Style="{StaticResource FieldLabel}" />
+                <TextBox x:Name="DestinationTextBox" Grid.Row="2" Grid.Column="1" TextChanged="CopyPath_TextChanged" />
+                <Button Grid.Row="2" Grid.Column="2" Content="{StaticResource Browse}" MinWidth="72" Margin="8,0,0,0" Click="BrowseDestination_Click" />
+
+                <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="112" />
+                        <ColumnDefinition Width="130" />
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{StaticResource OperationMode}" Style="{StaticResource FieldLabel}" />
+                    <ComboBox x:Name="OperationComboBox" Grid.Column="1" SelectedIndex="0"
+                              SelectionChanged="OperationComboBox_SelectionChanged">
+                        <ComboBoxItem Content="{StaticResource CopyMode}" Tag="Copy" />
+                        <ComboBoxItem Content="{StaticResource MoveMode}" Tag="Move" />
+                        <ComboBoxItem Content="{StaticResource UpdateSyncMode}" Tag="UpdateSync"
+                                      ToolTip="{StaticResource UpdateSyncModeTooltip}" />
+                        <ComboBoxItem Content="{StaticResource ContinuousSyncMode}" Tag="ContinuousSync"
+                                      ToolTip="{StaticResource ContinuousSyncModeTooltip}" />
+                    </ComboBox>
+                    <TextBlock Grid.Column="3" Text="{StaticResource Profile}" Style="{StaticResource FieldLabel}" Margin="0,0,10,0" />
+                    <ComboBox x:Name="ProfileComboBox" Grid.Column="4" DisplayMemberPath="Name"
+                              SelectionChanged="ProfileComboBox_SelectionChanged">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                <EventSetter Event="PreviewMouseRightButtonDown"
+                                            Handler="ProfileItem_PreviewMouseRightButtonDown" />
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                        <ComboBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{StaticResource RenameProfile}" Click="RenameProfile_Click" />
+                                <MenuItem Header="{StaticResource DuplicateProfile}" Click="DuplicateProfile_Click" />
+                                <Separator />
+                                <MenuItem Header="{StaticResource DeleteProfile}" Click="DeleteProfile_Click" />
+                            </ContextMenu>
+                        </ComboBox.ContextMenu>
+                    </ComboBox>
+                    <Button x:Name="SaveProfileButton" Grid.Column="5" Content="{StaticResource SaveProfile}"
+                            Margin="8,0,4,0" Click="SaveProfile_Click" />
+                    <Button Grid.Column="6" Content="{StaticResource JobList}" Click="JobList_Click" />
+                    <Button Grid.Column="7" Content="{StaticResource Exclusions}" Click="ConfigureExclusions_Click" />
+                    <TextBlock x:Name="ExclusionSummaryTextBlock" Grid.Column="8" Margin="10,0,0,0"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Foreground="{StaticResource SubtleTextBrush}" Text="{StaticResource NoExclusions}" />
+                </Grid>
+
+                <GroupBox Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Header="{StaticResource PerformanceOptions}" Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="160" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="72" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="72" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Margin="0,0,10,0" Text="{StaticResource MultiThread}" Style="{StaticResource FieldLabel}" />
+                        <ComboBox x:Name="MultiThreadComboBox" Grid.Column="1" IsEditable="True" SelectedIndex="0"
+                                  ToolTip="{StaticResource AutoMtTooltip}">
+                            <ComboBoxItem x:Name="AutoMtComboBoxItem" Content="{StaticResource AutoMtInitial}" Tag="Auto" />
+                            <ComboBoxItem Content="1" />
+                            <ComboBoxItem Content="2" />
+                            <ComboBoxItem Content="4" />
+                            <ComboBoxItem Content="8" />
+                            <ComboBoxItem Content="16" />
+                            <ComboBoxItem Content="32" />
+                            <ComboBoxItem Content="64" />
+                            <ComboBoxItem Content="128" />
+                        </ComboBox>
+                        <Button x:Name="ReevaluateAutoMtButton" Grid.Column="2" Margin="0"
+                                Content="{StaticResource ReevaluateAutoMt}"
+                                ToolTip="{StaticResource ReevaluateAutoMtTooltip}"
+                                Click="ReevaluateAutoMt_Click">
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{StaticResource MtBenchmarkHistory}"
+                                              Click="OpenMtBenchmarkHistory_Click" />
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
+                        <Popup x:Name="MtBenchmarkHistoryHintPopup" Grid.Column="2"
+                               PlacementTarget="{Binding ElementName=ReevaluateAutoMtButton}"
+                               Placement="Bottom" StaysOpen="True" AllowsTransparency="True">
+                            <Border Margin="0,6,0,0" Padding="12,8" CornerRadius="8"
+                                    Background="#FFFBEA" BorderBrush="#F0D98A" BorderThickness="1">
+                                <TextBlock Text="{StaticResource MtBenchmarkHistoryRightClickHint}" Foreground="{StaticResource TextBrush}" />
+                            </Border>
+                        </Popup>
+                        <TextBlock Grid.Column="4" Margin="0,0,10,0" Text="{StaticResource RetryCount}" Style="{StaticResource FieldLabel}" />
+                        <TextBox x:Name="RetryCountTextBox" Grid.Column="5" Text="3" HorizontalContentAlignment="Center" />
+                        <TextBlock Grid.Column="7" Margin="0,0,10,0" Text="{StaticResource RetryWait}" Style="{StaticResource FieldLabel}" />
+                        <TextBox x:Name="RetryWaitTextBox" Grid.Column="8" Text="5" HorizontalContentAlignment="Center" />
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Header="{StaticResource CopyOptions}" Padding="14,10">
+                    <WrapPanel Orientation="Horizontal">
+                        <CheckBox x:Name="RestartableCheckBox" Content="{StaticResource Restartable}" IsChecked="True"
+                                  VerticalAlignment="Center" Margin="0,4,26,4" />
+                        <CheckBox x:Name="IncludeEmptyDirectoriesCheckBox" Content="{StaticResource IncludeEmptyDirectories}"
+                                  VerticalAlignment="Center" Margin="0,4,26,4" />
+                        <CheckBox x:Name="ExcludeZeroByteFilesCheckBox" Content="{StaticResource ExcludeZeroByteFiles}"
+                                  ToolTip="{StaticResource ExcludeZeroByteFilesTooltip}" VerticalAlignment="Center" Margin="0,4,26,4" />
+                        <CheckBox x:Name="SaveLogCheckBox" Content="{StaticResource SaveLog}" IsChecked="True"
+                                  VerticalAlignment="Center" Margin="0,4,26,4" />
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,2">
+                            <TextBlock Text="{StaticResource SymbolicLinkHandling}" Style="{StaticResource FieldLabel}" Margin="0,0,10,0" />
+                            <ComboBox x:Name="LinkPolicyComboBox" Width="160" SelectedIndex="0">
+                                <ComboBoxItem Content="{StaticResource LinkExclude}" Tag="Exclude" />
+                                <ComboBoxItem Content="{StaticResource LinkCopy}" Tag="CopyLinkItself" />
+                                <ComboBoxItem Content="{StaticResource LinkFollow}" Tag="FollowTarget" />
+                            </ComboBox>
+                        </StackPanel>
+                    </WrapPanel>
+                </GroupBox>
+
+                <Grid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="CommandPreviewTextBlock" Grid.Column="0" Margin="2,0,12,0"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               ToolTipService.ShowDuration="60000"
+                               FontSize="12" Foreground="{StaticResource SubtleTextBrush}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="ToolTip" Value="{x:Null}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button x:Name="PreviewButton" Content="{StaticResource Analyze}" Click="Preview_Click" Visibility="Collapsed" />
+                        <Button x:Name="StartButton" Content="{StaticResource StartCopy}" Click="Start_Click"
+                                Style="{StaticResource PrimaryButton}" MinWidth="84" />
+                        <Button x:Name="AddJobButton" Content="{StaticResource AddJob}" Click="AddJob_Click" />
+                        <Button x:Name="PauseButton" Content="{StaticResource Pause}" IsEnabled="False"
+                                Click="Pause_Click" ToolTip="{StaticResource PauseTooltip}" />
+                        <Button x:Name="StopButton" Content="{StaticResource Stop}" Click="Stop_Click" IsEnabled="False" />
+                        <Button Content="{StaticResource ViewLog}" Click="Log_Click" />
+                        <Button x:Name="ErrorFilesButton" Content="{StaticResource ErrorFiles}" Click="ErrorFiles_Click" IsEnabled="False" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- 진행 상황 카드 -->
+        <Border Grid.Row="2" Margin="16,8,16,14" Padding="20,16" Background="{StaticResource PanelBrush}"
+                BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1" CornerRadius="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="6" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="2" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="ProgressLabelTextBlock" Text="{StaticResource ProgressCopy}" FontWeight="SemiBold"
+                               VerticalAlignment="Center" Foreground="{StaticResource TextBrush}" />
+                    <Grid Grid.Column="1">
+                        <ProgressBar x:Name="ProgressBar" Height="22" Minimum="0" Maximum="100" />
+                        <TextBlock x:Name="ProgressTextBlock" Text="0%" HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" FontSize="11.5" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrush}" />
+                    </Grid>
+                </Grid>
+                <TextBlock x:Name="PhaseNoticeTextBlock" Grid.Row="2" Margin="0,8,0,8"
+                           FontSize="18" FontWeight="SemiBold" TextAlignment="Center"
+                           Foreground="{StaticResource AccentBrush}" Visibility="Collapsed" />
+                <Grid Grid.Row="4" Margin="0,8,0,0">
+                <DataGrid x:Name="FileProgressDataGrid"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="None"
+                          SelectionMode="Single"
+                          RowHeight="36"
+                          ColumnHeaderHeight="36"
+                          EnableRowVirtualization="True">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="{StaticResource FileName}" Width="2*" MinWidth="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding FileName}" ToolTip="{Binding SourcePath}"
+                                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
+                                        <TextBlock.ContextMenu>
+                                            <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                <MenuItem Header="{StaticResource OpenSourceLocation}"
+                                                          CommandParameter="{Binding SourcePath}"
+                                                          Click="OpenLocation_Click" />
+                                            </ContextMenu>
+                                        </TextBlock.ContextMenu>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="{StaticResource Progress}" Width="160">
+                            <DataGridTemplateColumn.CellStyle>
+                                <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </DataGridTemplateColumn.CellStyle>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid Width="132" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}"
+                                                     Height="16" Foreground="{StaticResource SuccessBrush}"
+                                                     Background="{StaticResource ProgressTrackBrush}"
+                                                     SnapsToDevicePixels="True">
+                                            <ProgressBar.Template>
+                                                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                                                    <Border Background="{TemplateBinding Background}" ClipToBounds="True"
+                                                            SnapsToDevicePixels="True">
+                                                        <Grid x:Name="PART_Track">
+                                                            <Border x:Name="PART_Indicator" HorizontalAlignment="Left"
+                                                                    Background="{TemplateBinding Foreground}"
+                                                                    SnapsToDevicePixels="True" />
+                                                        </Grid>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </ProgressBar.Template>
+                                        </ProgressBar>
+                                        <TextBlock Text="{Binding Percent, StringFormat={}{0:F0}%}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="{StaticResource DestinationLocation}" Width="3*" MinWidth="160">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <local:PathTextBlock FullPath="{Binding DestinationPath}" VerticalAlignment="Center">
+                                        <local:PathTextBlock.ContextMenu>
+                                            <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                <MenuItem Header="{StaticResource OpenDestinationLocation}"
+                                                          CommandParameter="{Binding DestinationPath}"
+                                                          Click="OpenLocation_Click" />
+                                            </ContextMenu>
+                                        </local:PathTextBlock.ContextMenu>
+                                    </local:PathTextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Grid x:Name="CopySummaryPanel" Visibility="Collapsed" Margin="10,4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid x:Name="CopySummaryDataGrid" Grid.Row="0" Height="128"
+                              AutoGenerateColumns="False" IsReadOnly="True" IsHitTestVisible="False"
+                              CanUserAddRows="False" HeadersVisibility="Column" GridLinesVisibility="None"
+                              BorderThickness="0" Background="Transparent" RowBackground="Transparent"
+                              AlternatingRowBackground="Transparent" RowHeight="30" MinRowHeight="30" ColumnHeaderHeight="34">
+                        <DataGrid.Resources>
+                            <Style x:Key="SummaryValueText" TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Right" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="6,0" />
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="" Binding="{Binding Label}" Width="110" FontWeight="SemiBold" />
+                            <DataGridTextColumn Header="{StaticResource SummaryTotal}" Binding="{Binding Total}" Width="*" ElementStyle="{StaticResource SummaryValueText}" />
+                            <DataGridTextColumn Header="{StaticResource SummaryCopied}" Binding="{Binding Copied}" Width="*" ElementStyle="{StaticResource SummaryValueText}" />
+                            <DataGridTextColumn Header="{StaticResource SummarySkipped}" Binding="{Binding Skipped}" Width="*" ElementStyle="{StaticResource SummaryValueText}" />
+                            <DataGridTextColumn Header="{StaticResource SummaryMismatch}" Binding="{Binding Mismatch}" Width="*" ElementStyle="{StaticResource SummaryValueText}" />
+                            <DataGridTextColumn Header="{StaticResource SummaryFailed}" Binding="{Binding Failed}" Width="*" ElementStyle="{StaticResource SummaryValueText}" />
+                            <DataGridTextColumn Header="{StaticResource SummaryExtras}" Binding="{Binding Extras}" Width="*" ElementStyle="{StaticResource SummaryValueText}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Grid Grid.Row="2" Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{StaticResource SummaryTimes}" FontWeight="SemiBold" />
+                        <TextBlock x:Name="SummaryTimeTextBlock" Grid.Column="1" TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Grid.Row="3" Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{StaticResource SummarySpeed}" FontWeight="SemiBold" />
+                        <TextBlock x:Name="SummarySpeedFirstTextBlock" Grid.Column="1" />
+                    </Grid>
+                    <Grid Grid.Row="4" Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{StaticResource SummarySpeed}" FontWeight="SemiBold" />
+                        <TextBlock x:Name="SummarySpeedSecondTextBlock" Grid.Column="1" />
+                    </Grid>
+                    <Grid Grid.Row="5" Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{StaticResource SummaryEnded}" FontWeight="SemiBold" />
+                        <TextBlock x:Name="SummaryEndedTextBlock" Grid.Column="1" />
+                    </Grid>
+                </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <StatusBar Grid.Row="3">
+            <StatusBarItem>
+                <TextBlock x:Name="FooterStatusTextBlock" Text="{StaticResource Ready}" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
