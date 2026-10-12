@@ -76,10 +76,70 @@ public sealed class NamedFileCopyServiceTests : IDisposable
         Assert.Equal("content copied before delete", await File.ReadAllTextAsync(destination));
     }
 
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public async Task CopyAsync_ApprovedOverwriteHandlesReadOnlyAndPreservesSourceAttributes(bool sourceReadOnly, bool targetReadOnly)
+    {
+        Directory.CreateDirectory(_root);
+        var source = Path.Combine(_root, "원본 공백 & #.txt");
+        var target = Path.Combine(_root, "대상 공백 & #.txt");
+        await File.WriteAllTextAsync(source, "new content");
+        await File.WriteAllTextAsync(target, "old content");
+        if (sourceReadOnly) File.SetAttributes(source, File.GetAttributes(source) | FileAttributes.ReadOnly);
+        if (targetReadOnly) File.SetAttributes(target, File.GetAttributes(target) | FileAttributes.ReadOnly);
+        await new NamedFileCopyService().CopyAsync(source, target, false, overwriteDestination: true);
+        Assert.Equal("new content", await File.ReadAllTextAsync(target));
+        Assert.Equal(sourceReadOnly, File.GetAttributes(target).HasFlag(FileAttributes.ReadOnly));
+        Assert.Equal(sourceReadOnly, File.GetAttributes(source).HasFlag(FileAttributes.ReadOnly));
+        Assert.Empty(Directory.GetFiles(_root, "*.tmp"));
+    }
+
+    [Fact]
+    public async Task CopyAsync_FailedReplacementRestoresReadOnlyTargetAndCleansTemporaryFile()
+    {
+        Directory.CreateDirectory(_root);
+        var source = Path.Combine(_root, "source.txt");
+        var target = Path.Combine(_root, "locked target.txt");
+        await File.WriteAllTextAsync(source, "new content");
+        await File.WriteAllTextAsync(target, "old content");
+        File.SetAttributes(source, File.GetAttributes(source) | FileAttributes.ReadOnly);
+        File.SetAttributes(target, File.GetAttributes(target) | FileAttributes.ReadOnly);
+        using (var locked = new FileStream(target, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            var error = await Record.ExceptionAsync(() =>
+                new NamedFileCopyService().CopyAsync(source, target, false, overwriteDestination: true));
+            Assert.True(error is IOException or UnauthorizedAccessException);
+            Assert.Contains(error.HResult & 0xFFFF, new[] { 5, 32, 33 });
+        }
+        Assert.True(File.GetAttributes(target).HasFlag(FileAttributes.ReadOnly));
+        Assert.Equal("old content", await File.ReadAllTextAsync(target));
+        Assert.Empty(Directory.GetFiles(_root, "*.tmp"));
+    }
+
+    [Fact]
+    public async Task CopyAsync_UnapprovedOverwriteDoesNotChangeReadOnlyTarget()
+    {
+        Directory.CreateDirectory(_root);
+        var source = Path.Combine(_root, "source.txt");
+        var target = Path.Combine(_root, "target.txt");
+        await File.WriteAllTextAsync(source, "new content");
+        await File.WriteAllTextAsync(target, "old content");
+        File.SetAttributes(source, File.GetAttributes(source) | FileAttributes.ReadOnly);
+        File.SetAttributes(target, File.GetAttributes(target) | FileAttributes.ReadOnly);
+        await Assert.ThrowsAnyAsync<IOException>(() => new NamedFileCopyService().CopyAsync(source, target, false));
+        Assert.True(File.GetAttributes(target).HasFlag(FileAttributes.ReadOnly));
+        Assert.Equal("old content", await File.ReadAllTextAsync(target));
+        Assert.Empty(Directory.GetFiles(_root, "*.tmp"));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_root))
         {
+            foreach (var file in Directory.EnumerateFiles(_root, "*", SearchOption.AllDirectories))
+                File.SetAttributes(file, File.GetAttributes(file) & ~FileAttributes.ReadOnly);
             Directory.Delete(_root, recursive: true);
         }
     }

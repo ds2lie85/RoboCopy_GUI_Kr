@@ -61,6 +61,8 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<ErrorFileRow> _errorItems = [];
     private readonly ObservableCollection<ProfileSelectionItem> _profileItems = [];
     private readonly Dictionary<Guid, ErrorFileRow> _retryRowsByJobId = [];
+    private readonly Dictionary<Guid, IReadOnlyList<OneWaySyncExtraItem>> _syncDeletionSelections = [];
+    private readonly Dictionary<Guid, RobocopyJobOptions> _syncReviewedOptions = [];
     private readonly Dictionary<ErrorFileRow, MoveFailureContext> _moveFailureContexts = [];
     private readonly Dictionary<ErrorFileRow, MoveDeletionRetryContext> _moveDeletionRetryOptions = [];
     private readonly Dictionary<string, FileCopyProgressItem> _fileProgressBySource = new(StringComparer.OrdinalIgnoreCase);
@@ -179,6 +181,7 @@ public partial class MainWindow : Window
             _ => "MiniUiOperationCopy",
         });
         var canPauseOrResume = _cancellationTokenSource is not null || _pausedQueueEntryId is not null;
+        var hasFailedJobs = _jobQueue.Items.Any(item => item.State == JobQueueEntryState.Failed);
         return new MiniUiState(
             Name(source),
             Name(destination),
@@ -190,7 +193,11 @@ public partial class MainWindow : Window
             ProgressBar.IsIndeterminate,
             _pausedQueueEntryId is not null,
             canPauseOrResume,
-            _miniWorkStarted && !canPauseOrResume && !_isProcessingQueue && _jobQueue.WaitingCount == 0 && percent >= 100);
+            _miniWorkStarted && !canPauseOrResume && !_isProcessingQueue && _jobQueue.WaitingCount == 0 && percent >= 100 && !hasFailedJobs,
+            MiniUiCompletionPolicy.RequiresErrorManagement(_miniWorkStarted,
+                _isProcessingQueue || _cancellationTokenSource is not null,
+                _pausedQueueEntryId is not null, _jobQueue.WaitingCount, hasFailedJobs,
+                _errorItems.Any(row => row.RetryState != ErrorFileRetryState.Resolved)));
     }
 
     internal void TogglePauseFromMiniUi()
@@ -225,6 +232,18 @@ public partial class MainWindow : Window
     }
 
     internal void NotifyMiniUiClosed() => _miniCopyWindow = null;
+
+    internal void ShowErrorManagementUi()
+    {
+        ShowAdvancedUi();
+        if (_errorFilesWindow is not null)
+        {
+            _errorFilesWindow.Owner = this;
+        }
+        ErrorFiles_Click(this, new RoutedEventArgs());
+    }
+
+    private Window? GetDialogOwner() => WindowOwnerSelector.Select(this, _miniCopyWindow);
 
     internal void CloseFromMiniUi()
     {
@@ -283,7 +302,7 @@ public partial class MainWindow : Window
 
         var dialog = new ExclusionWindow(SourceTextBox.Text, _excludedDirectories, _excludedFiles)
         {
-            Owner = this,
+            Owner = GetDialogOwner(),
         };
 
         if (dialog.ShowDialog() != true)
@@ -412,7 +431,7 @@ public partial class MainWindow : Window
 
     private void SaveProfileAsNew(string initialName = "")
     {
-        var dialog = new ProfileNameWindow(initialName) { Owner = this };
+        var dialog = new ProfileNameWindow(initialName) { Owner = GetDialogOwner() };
         if (dialog.ShowDialog() != true
             || !TryCreateProfile(Guid.NewGuid(), dialog.ProfileName, out var profile)
             || !SaveProfile(profile))
@@ -540,7 +559,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var dialog = new ProfileNameWindow(selected.Name) { Owner = this };
+        var dialog = new ProfileNameWindow(selected.Name) { Owner = GetDialogOwner() };
         if (dialog.ShowDialog() == true && SaveProfile(selected with { Name = dialog.ProfileName }))
         {
             LoadProfiles(selected.Id);
@@ -557,7 +576,7 @@ public partial class MainWindow : Window
         }
 
         var suggestedName = string.Format(CultureInfo.CurrentCulture, GetText("DuplicateProfileNameFormat"), selected.Name);
-        var dialog = new ProfileNameWindow(suggestedName) { Owner = this };
+        var dialog = new ProfileNameWindow(suggestedName) { Owner = GetDialogOwner() };
         if (dialog.ShowDialog() == true)
         {
             var duplicate = selected with { Id = Guid.NewGuid(), Name = dialog.ProfileName };
@@ -620,7 +639,7 @@ public partial class MainWindow : Window
 
         _jobQueueWindow = new JobQueueWindow(_jobQueue, CreateQueueTemplate)
         {
-            Owner = this,
+            Owner = GetDialogOwner(),
         };
         _jobQueueWindow.RunnableJobAdded += QueueWindow_RunnableJobAdded;
         _jobQueueWindow.Closed += (_, _) => _jobQueueWindow = null;
@@ -629,7 +648,7 @@ public partial class MainWindow : Window
 
     private void ExplorerIntegration_Click(object sender, RoutedEventArgs e)
     {
-        new ExplorerIntegrationWindow { Owner = this }.ShowDialog();
+        new ExplorerIntegrationWindow { Owner = GetDialogOwner() }.ShowDialog();
     }
 
     private async void QueueWindow_RunnableJobAdded(object? sender, EventArgs e)
@@ -766,7 +785,7 @@ public partial class MainWindow : Window
             ContinuousSyncConfiguration configuration;
             while (true)
             {
-                var window = new ContinuousSyncSettingsWindow(options, existing) { Owner = this };
+                var window = new ContinuousSyncSettingsWindow(options, existing) { Owner = GetDialogOwner() };
                 if (window.ShowDialog() != true || window.Configuration is not { } edited)
                 {
                     return;
@@ -831,7 +850,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        _logWindow = new LogWindow(_displayLog.ToString()) { Owner = this };
+        _logWindow = new LogWindow(_displayLog.ToString()) { Owner = GetDialogOwner() };
         _logWindow.Closed += (_, _) => _logWindow = null;
         _logWindow.Show();
     }
@@ -844,7 +863,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        _errorFilesWindow = new ErrorFilesWindow(_errorItems) { Owner = this };
+        _errorFilesWindow = new ErrorFilesWindow(_errorItems) { Owner = GetDialogOwner() };
         _errorFilesWindow.RetryRequested += ErrorFilesWindow_RetryRequested;
         _errorFilesWindow.ElevatedRetryRequested += ErrorFilesWindow_ElevatedRetryRequested;
         _errorFilesWindow.Closed += (_, _) => _errorFilesWindow = null;
@@ -1052,6 +1071,11 @@ public partial class MainWindow : Window
 
                 var outcome = await ExecuteJobAsync(entry.Options, dryRun: false, entry.Id);
                 _jobQueue.SetState(entry.Id, outcome);
+                if (outcome != JobQueueEntryState.Paused)
+                {
+                    _syncDeletionSelections.Remove(entry.Id);
+                    _syncReviewedOptions.Remove(entry.Id);
+                }
                 if (outcome == JobQueueEntryState.Completed)
                 {
                     _miniProcessedFilesBeforeCurrent = Math.Min(
@@ -1112,6 +1136,8 @@ public partial class MainWindow : Window
         {
             ShowAggregateCopySummary(aggregate);
         }
+        if (_jobQueue.Items.Any(item => item.State == JobQueueEntryState.Failed))
+            SetStatus(GetText("MiniUiFailedJobs"));
     }
 
     private async Task ResumePostCopyOperationAsync(Guid pausedEntryId)
@@ -1280,27 +1306,25 @@ public partial class MainWindow : Window
             IReadOnlyList<OneWaySyncExtraItem> selectedSyncDeletions = [];
             if (options.OperationMode == JobOperationMode.UpdateSync)
             {
-                var syncExtras = await Task.Run(
-                    () => _oneWaySyncPlanner.FindDestinationOnlyItems(options, _cancellationTokenSource.Token),
-                    _cancellationTokenSource.Token);
                 if (dryRun)
                 {
+                    var syncExtras = await Task.Run(
+                        () => _oneWaySyncPlanner.FindDestinationOnlyItems(options, _cancellationTokenSource.Token),
+                        _cancellationTokenSource.Token);
                     AppendOutput(string.Format(
                         CultureInfo.CurrentCulture,
                         GetText("OneWaySyncPreviewExtrasFormat"),
                         syncExtras.Count));
                 }
-                else if (syncExtras.Count > 0)
+                else if (queueEntryId is Guid syncJobId)
                 {
-                    var reviewWindow = new OneWaySyncReviewWindow(syncExtras) { Owner = this };
-                    if (reviewWindow.ShowDialog() != true)
+                    if (!await ReviewSyncBatchAsync(syncJobId, _cancellationTokenSource.Token))
                     {
                         SetStatus(GetText("OneWaySyncCanceled"));
                         AppendOutput(GetText("OneWaySyncCanceled"));
                         return JobQueueEntryState.Stopped;
                     }
-
-                    selectedSyncDeletions = reviewWindow.SelectedForDeletion;
+                    selectedSyncDeletions = _syncDeletionSelections[syncJobId];
                 }
             }
 
@@ -1365,7 +1389,7 @@ public partial class MainWindow : Window
                     && options.OperationMode == JobOperationMode.Move
                     && mergedErrorRows.Count > 0)
                 {
-                    var decisionWindow = new MoveFailureDecisionWindow(mergedErrorRows.Count) { Owner = this };
+                    var decisionWindow = new MoveFailureDecisionWindow(mergedErrorRows.Count) { Owner = GetDialogOwner() };
                     _ = decisionWindow.ShowDialog();
                     switch (decisionWindow.Decision)
                     {
@@ -1644,6 +1668,7 @@ public partial class MainWindow : Window
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             SaveCurrentJob(JobExecutionState.Failed);
+            _activeQueueSummary?.AddFailedFile(sourceLength, DateTimeOffset.Now - startedAt);
             SetStatus(GetText("UnexpectedError"));
             AppendOutput($"{GetText("UnexpectedError")} {exception.Message}");
             MessageBox.Show(this, exception.Message, GetText("UnexpectedError"), MessageBoxButton.OK, MessageBoxImage.Error);
@@ -2009,7 +2034,7 @@ public partial class MainWindow : Window
             SourceTextBox.Text,
             DestinationTextBox.Text)
         {
-            Owner = this,
+            Owner = GetDialogOwner(),
         };
         historyWindow.HistoryChanged += (_, _) => UpdateAutoMtDisplay();
         historyWindow.Show();
@@ -2975,7 +3000,7 @@ public partial class MainWindow : Window
             .ToArray();
         if (!_shellConflictsAlreadyReviewed && conflictCandidates.Length > 0)
         {
-            var scanWindow = new ShellConflictScanProgressWindow { Owner = this };
+            var scanWindow = new ShellConflictScanProgressWindow { Owner = GetDialogOwner() };
             ShellCopyConflictAnalysis analysis;
             try
             {
@@ -2991,7 +3016,7 @@ public partial class MainWindow : Window
 
             if (analysis.Groups.Count > 0)
             {
-                var conflictWindow = new ShellCopyConflictWindow(analysis.Groups) { Owner = this };
+                var conflictWindow = new ShellCopyConflictWindow(analysis.Groups) { Owner = GetDialogOwner() };
                 if (conflictWindow.ShowDialog() != true)
                 {
                     SetStatus(GetText("Ready"));
@@ -3053,6 +3078,40 @@ public partial class MainWindow : Window
         {
             SetStatus(GetText("ShellRequestReady"));
         }
+    }
+
+    internal async Task<bool> ReviewSyncBatchAsync(Guid jobId, CancellationToken cancellationToken)
+    {
+        var entries = _jobQueue.Items;
+        // Edited or removed jobs must not inherit deletion approval for old paths.
+        foreach (var id in _syncReviewedOptions.Keys.ToArray())
+        {
+            if (!entries.Any(entry => entry.Id == id && entry.Options == _syncReviewedOptions[id]))
+            {
+                _syncReviewedOptions.Remove(id);
+                _syncDeletionSelections.Remove(id);
+            }
+        }
+        if (_syncDeletionSelections.ContainsKey(jobId)) return true;
+        var jobs = entries.Where(entry => entry.Options.OperationMode == JobOperationMode.UpdateSync
+                && (entry.Id == jobId || entry.State == JobQueueEntryState.Waiting)
+                && !_syncDeletionSelections.ContainsKey(entry.Id))
+            .ToDictionary(entry => entry.Id, entry => entry.Options);
+        var plan = await Task.Run(() => OneWaySyncBatchPlan.Create(jobs, cancellationToken), cancellationToken);
+        IReadOnlyList<OneWaySyncExtraItem> selected = [];
+        if (plan.Items.Count > 0)
+        {
+            var review = new OneWaySyncReviewWindow(plan.Items) { Owner = GetDialogOwner() };
+            if (review.ShowDialog() != true) return false;
+            selected = review.SelectedForDeletion;
+        }
+        cancellationToken.ThrowIfCancellationRequested();
+        foreach (var (id, items) in plan.ApplySelection(selected))
+        {
+            _syncDeletionSelections[id] = items;
+            _syncReviewedOptions[id] = jobs[id];
+        }
+        return true;
     }
 
     private void MergeShellSelectionExclusions(ShellCopyRequest request)

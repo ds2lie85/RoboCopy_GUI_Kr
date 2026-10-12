@@ -18,9 +18,33 @@
             <TextBlock Margin="0,7,0,0" Text="{StaticResource ShellOverwriteSelectionInstruction}"
                        TextWrapping="Wrap" Foreground="{StaticResource SubtleTextBrush}" />
         </StackPanel>
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <ItemsControl ItemsSource="{Binding Rows}">
-                <ItemsControl.ItemTemplate>
+        <ListBox x:Name="OverwriteGroupsList" Grid.Row="2" ItemsSource="{Binding Rows}"
+                 BorderThickness="0" Padding="0" Background="Transparent"
+                 ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                 VirtualizingPanel.ScrollUnit="Pixel">
+                <ListBox.Template>
+                    <ControlTemplate TargetType="ListBox">
+                        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Template">
+                            <Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter /></ControlTemplate></Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border Margin="0,0,0,12" Padding="14" BorderBrush="{StaticResource CardBorderBrush}" BorderThickness="1" Background="{StaticResource PanelBrush}" CornerRadius="12">
                             <StackPanel>
@@ -60,9 +84,8 @@
                             </StackPanel>
                         </Border>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+                </ListBox.ItemTemplate>
+        </ListBox>
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="{StaticResource Cancel}" IsCancel="True" />
             <Button Content="{StaticResource ApplySelection}" IsDefault="True" Click="Apply_Click" Style="{StaticResource PrimaryButton}" />

@@ -19,4 +19,9 @@
     <SatelliteResourceLanguages>ko;en-US</SatelliteResourceLanguages>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Update="ExplorerPackage\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <InternalsVisibleTo Include="RoboCopy_GUI_Kr.Windows.Tests" />
+  </ItemGroup>
+
 </Project>

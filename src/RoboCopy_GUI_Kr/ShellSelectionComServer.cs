@@ -10,6 +10,10 @@ internal sealed class ShellSelectionComServer : IDisposable
     private readonly Action<IReadOnlyList<string>> _selectionReceived;
     private readonly ShellSelectionClassFactory _factory;
     private uint _registrationCookie;
+    private uint _modernRegistrationCookie;
+    private uint _pasteRegistrationCookie;
+    private readonly ShellSelectionClassFactory _modernFactory;
+    private readonly ShellSelectionClassFactory _pasteFactory;
     private DispatcherTimer? _timeoutTimer;
 
     public ShellSelectionComServer(Dispatcher dispatcher, Action<IReadOnlyList<string>> selectionReceived)
@@ -17,6 +21,8 @@ internal sealed class ShellSelectionComServer : IDisposable
         _dispatcher = dispatcher;
         _selectionReceived = selectionReceived;
         _factory = new ShellSelectionClassFactory(HandleSelection);
+        _modernFactory = new ShellSelectionClassFactory(HandleSelection, modern: true);
+        _pasteFactory = new ShellSelectionClassFactory(HandleSelection, modern: true, background: true);
     }
 
     public void Start()
@@ -28,6 +34,13 @@ internal sealed class ShellSelectionComServer : IDisposable
             ClassContext.LocalServer,
             RegistrationClass.MultipleUse,
             out _registrationCookie));
+
+        var modernClassId = Guid.Parse(ShellExplorerCommand.ActiveClassId);
+        Marshal.ThrowExceptionForHR(CoRegisterClassObject(ref modernClassId, _modernFactory,
+            ClassContext.LocalServer, RegistrationClass.MultipleUse, out _modernRegistrationCookie));
+        var pasteClassId = Guid.Parse(ShellExplorerCommand.ActivePasteClassId);
+        Marshal.ThrowExceptionForHR(CoRegisterClassObject(ref pasteClassId, _pasteFactory,
+            ClassContext.LocalServer, RegistrationClass.MultipleUse, out _pasteRegistrationCookie));
 
         _timeoutTimer = new DispatcherTimer(TimeSpan.FromMinutes(2), DispatcherPriority.Background, (_, _) =>
         {
@@ -55,6 +68,16 @@ internal sealed class ShellSelectionComServer : IDisposable
     public void Dispose()
     {
         _timeoutTimer?.Stop();
+        if (_pasteRegistrationCookie != 0)
+        {
+            _ = CoRevokeClassObject(_pasteRegistrationCookie);
+            _pasteRegistrationCookie = 0;
+        }
+        if (_modernRegistrationCookie != 0)
+        {
+            _ = CoRevokeClassObject(_modernRegistrationCookie);
+            _modernRegistrationCookie = 0;
+        }
         if (_registrationCookie != 0)
         {
             _ = CoRevokeClassObject(_registrationCookie);
@@ -90,9 +113,15 @@ internal sealed class ShellSelectionComServer : IDisposable
 internal sealed class ShellSelectionClassFactory : IClassFactory
 {
     private readonly Action<IReadOnlyList<string>> _selectionReceived;
+    private readonly bool _modern;
+    private readonly bool _background;
 
-    public ShellSelectionClassFactory(Action<IReadOnlyList<string>> selectionReceived) =>
+    public ShellSelectionClassFactory(Action<IReadOnlyList<string>> selectionReceived, bool modern = false, bool background = false)
+    {
         _selectionReceived = selectionReceived;
+        _modern = modern;
+        _background = background;
+    }
 
     public int CreateInstance(IntPtr outer, ref Guid interfaceId, out IntPtr instance)
     {
@@ -102,7 +131,8 @@ internal sealed class ShellSelectionClassFactory : IClassFactory
             return unchecked((int)0x80040110); // CLASS_E_NOAGGREGATION
         }
 
-        var handler = new ShellSelectionExecuteCommand(_selectionReceived);
+        object handler = _modern ? new ShellExplorerCommand(_selectionReceived, _background ? null : "ExplorerCopyCaption")
+            : new ShellSelectionExecuteCommand(_selectionReceived);
         var unknown = Marshal.GetIUnknownForObject(handler);
         try
         {

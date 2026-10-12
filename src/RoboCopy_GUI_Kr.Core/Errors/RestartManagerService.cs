@@ -18,6 +18,45 @@ public sealed class RestartManagerService
     public IReadOnlyList<LockingProcessInfo> GetLockingProcesses(IEnumerable<string> paths)
     {
         var files = NormalizePaths(paths);
+        var selfUsesFile = files.Any(IsCurrentProcessUsingFile);
+        List<LockingProcessInfo> processes;
+        try
+        {
+            processes = GetRestartManagerProcesses(files).ToList();
+        }
+        catch (Win32Exception) when (selfUsesFile && files.All(IsCurrentProcessUsingFile))
+        {
+            // Even if the OS lookup is unavailable, self-use is independently proven.
+            // For mixed paths propagate the error instead of hiding unknown locks.
+            processes = [];
+        }
+        // Restart Manager may omit its caller. Include its executable, native modules,
+        // and managed assemblies explicitly so a self-overwrite is diagnosable.
+        if (selfUsesFile
+            && processes.All(process => process.ProcessId != Environment.ProcessId))
+        {
+            using var current = Process.GetCurrentProcess();
+            processes.Add(new LockingProcessInfo(Environment.ProcessId, current.ProcessName, string.Empty, false));
+        }
+        return processes;
+    }
+
+    public static bool IsCurrentProcessUsingFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        var fullPath = Path.GetFullPath(path);
+        bool Matches(string? candidate) => !string.IsNullOrWhiteSpace(candidate)
+            && string.Equals(fullPath, Path.GetFullPath(candidate), StringComparison.OrdinalIgnoreCase);
+        if (Matches(Environment.ProcessPath)) return true;
+        if (AppDomain.CurrentDomain.GetAssemblies().Any(assembly => !assembly.IsDynamic && Matches(assembly.Location)))
+            return true;
+        using var current = Process.GetCurrentProcess();
+        return current.Modules.Cast<ProcessModule>().Any(module => Matches(module.FileName));
+    }
+
+    private IReadOnlyList<LockingProcessInfo> GetRestartManagerProcesses(IEnumerable<string> paths)
+    {
+        var files = NormalizePaths(paths);
         if (files.Length == 0)
         {
             return [];

@@ -18,12 +18,19 @@ public partial class LockingProcessesWindow : Window
         _processes = processes;
         _paths = paths;
         DataContext = _processes;
+        RequestShutdownButton.IsEnabled = !_processes.Any(process => process.ProcessId == Environment.ProcessId);
     }
 
     public bool RetryRequested { get; private set; }
 
     private async void RequestShutdown_Click(object sender, RoutedEventArgs e)
     {
+        if (_processes.Any(process => process.ProcessId == Environment.ProcessId))
+        {
+            MessageBox.Show(this, GetText("SelfOverwriteGuidance"), GetText("LockingProcessesTitle"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
         var names = string.Join(", ", _processes.Select(process =>
             string.IsNullOrWhiteSpace(process.ApplicationName)
                 ? $"PID {process.ProcessId}"
@@ -83,7 +90,8 @@ public partial class LockingProcessesWindow : Window
         }
         finally
         {
-            RequestShutdownButton.IsEnabled = _processes.Count > 0;
+            RequestShutdownButton.IsEnabled = _processes.Count > 0
+                && !_processes.Any(process => process.ProcessId == Environment.ProcessId);
         }
     }
 

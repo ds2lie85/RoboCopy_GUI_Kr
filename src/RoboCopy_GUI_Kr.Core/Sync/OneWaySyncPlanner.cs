@@ -33,6 +33,7 @@ public sealed class OneWaySyncPlanner
             cancellationToken.ThrowIfCancellationRequested();
             var directory = pending.Pop();
             destinationFiles.AddRange(Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly));
+            if (!options.RecurseSubdirectories) continue;
             foreach (var child in Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly))
             {
                 if ((File.GetAttributes(child) & FileAttributes.ReparsePoint) != 0)

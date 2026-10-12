@@ -1,4 +1,7 @@
 using Microsoft.Win32;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
 using RoboCopy_GUI_Kr.Core.Models;
 
 namespace RoboCopy_GUI_Kr;
@@ -27,8 +30,9 @@ internal sealed class ExplorerContextMenuService
 
     public void RegisterCopyMenu()
     {
-        Unregister();
+        DeleteLegacyRegistration();
         CreateCopySelectionVerb(GetExecutablePath());
+        RegisterModernMenu();
     }
 
     public void ShowPasteMenu()
@@ -41,11 +45,46 @@ internal sealed class ExplorerContextMenuService
 
     public void Unregister()
     {
+        if (IsCurrentExecutableComServer()) RunPackageRegistration(unregister: true);
+        DeleteLegacyRegistration();
+    }
+
+    private static void DeleteLegacyRegistration()
+    {
         foreach (var key in Keys.Concat(LegacyKeys))
         {
             DeleteKey(key);
         }
     }
+
+    private static void RegisterModernMenu()
+    {
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000)) RunPackageRegistration(unregister: false);
+    }
+
+    private static void RunPackageRegistration(bool unregister)
+    {
+        var script = Path.Combine(AppContext.BaseDirectory, "ExplorerPackage", "Register-ExplorerPackage.ps1");
+        if (!File.Exists(script)) return; // Existing installer payloads retain their legacy registration.
+        var powershell = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),
+            "WindowsPowerShell", "v1.0", "powershell.exe");
+        var start = new ProcessStartInfo(powershell)
+        {
+            UseShellExecute = false, CreateNoWindow = true,
+            RedirectStandardError = true,
+        };
+        foreach (var argument in new[] { "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", script })
+            start.ArgumentList.Add(argument);
+        if (unregister) start.ArgumentList.Add("-Unregister");
+        if (File.Exists(Path.Combine(AppContext.BaseDirectory, "ExplorerPackage", "AppxManifest.Installed.xml")))
+            start.ArgumentList.Add("-Installed");
+        using var process = Process.Start(start) ?? throw new IOException(Text("ExplorerPackageStartFailed"));
+        var error = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+        if (process.ExitCode != 0) throw new IOException(error);
+    }
+
+    private static string Text(string key) => (string)Application.Current.FindResource(key);
 
     internal static string BuildCommand(string executablePath, string option, params string[] arguments)
     {
@@ -79,7 +118,7 @@ internal sealed class ExplorerContextMenuService
         }
 
         using var verb = Registry.CurrentUser.CreateSubKey($@"{Root}\{CopySelectionKey}", writable: true);
-        verb.SetValue(null, "Robocopy로 복사");
+        verb.SetValue(null, Text("ExplorerCopyCaption"));
         verb.SetValue("Icon", executablePath);
         verb.SetValue("MultiSelectModel", "Player");
         verb.SetValue("Position", "Top");
@@ -91,15 +130,15 @@ internal sealed class ExplorerContextMenuService
     private static void CreatePasteCascade(string relativeKey, string executablePath, string placeholder)
     {
         using var menu = Registry.CurrentUser.CreateSubKey($@"{Root}\{relativeKey}", writable: true);
-        menu.SetValue("MUIVerb", "Robocopy로 붙여넣기");
+        menu.SetValue("MUIVerb", Text("ExplorerPasteMenuCaption"));
         menu.SetValue("Icon", executablePath);
         menu.SetValue("SubCommands", string.Empty);
         menu.SetValue("Position", "Top");
 
-        CreateSubVerb(menu, "01.Copy", "붙여넣기", executablePath, JobOperationMode.Copy, placeholder);
-        CreateSubVerb(menu, "02.Move", "이동", executablePath, JobOperationMode.Move, placeholder);
-        CreateSubVerb(menu, "03.UpdateSync", "단방향 동기화(백업)", executablePath, JobOperationMode.UpdateSync, placeholder);
-        CreateSubVerb(menu, "04.ContinuousSync", "단방향 동기화(지속)", executablePath, JobOperationMode.ContinuousSync, placeholder);
+        CreateSubVerb(menu, "01.Copy", Text("ExplorerPasteCaption"), executablePath, JobOperationMode.Copy, placeholder);
+        CreateSubVerb(menu, "02.Move", Text("ExplorerMoveCaption"), executablePath, JobOperationMode.Move, placeholder);
+        CreateSubVerb(menu, "03.UpdateSync", Text("ExplorerBackupCaption"), executablePath, JobOperationMode.UpdateSync, placeholder);
+        CreateSubVerb(menu, "04.ContinuousSync", Text("ExplorerContinuousCaption"), executablePath, JobOperationMode.ContinuousSync, placeholder);
     }
 
     private static void CreateSubVerb(

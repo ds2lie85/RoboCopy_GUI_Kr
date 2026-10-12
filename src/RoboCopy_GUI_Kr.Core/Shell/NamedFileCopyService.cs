@@ -22,6 +22,7 @@ public sealed class NamedFileCopyService
         var destinationDirectory = Path.GetDirectoryName(Path.GetFullPath(destinationPath))!;
         Directory.CreateDirectory(destinationDirectory);
         var temporaryPath = Path.Combine(destinationDirectory, $".{Path.GetFileName(destinationPath)}.{Guid.NewGuid():N}.tmp");
+        Exception? operationFailure = null;
         try
         {
             await using (var source = new FileStream(
@@ -54,8 +55,11 @@ public sealed class NamedFileCopyService
 
             File.SetCreationTime(temporaryPath, sourceInfo.CreationTime);
             File.SetLastWriteTime(temporaryPath, sourceInfo.LastWriteTime);
-            File.SetAttributes(temporaryPath, sourceInfo.Attributes & ~FileAttributes.ReparsePoint);
-            File.Move(temporaryPath, destinationPath, overwriteDestination);
+            var sourceAttributes = sourceInfo.Attributes & ~FileAttributes.ReparsePoint;
+            File.SetAttributes(temporaryPath, sourceAttributes & ~FileAttributes.ReadOnly);
+            cancellationToken.ThrowIfCancellationRequested();
+            ReplaceTemporaryFile(temporaryPath, destinationPath, overwriteDestination);
+            File.SetAttributes(destinationPath, sourceAttributes);
             progress?.Report(100);
 
             if (moveSource)
@@ -74,12 +78,58 @@ public sealed class NamedFileCopyService
                 }
             }
         }
+        catch (Exception exception)
+        {
+            operationFailure = exception;
+            throw;
+        }
         finally
         {
-            if (File.Exists(temporaryPath))
+            try
             {
-                File.Delete(temporaryPath);
+                if (File.Exists(temporaryPath))
+                {
+                    File.SetAttributes(temporaryPath, File.GetAttributes(temporaryPath) & ~FileAttributes.ReadOnly);
+                    File.Delete(temporaryPath);
+                }
             }
+            catch (Exception cleanupFailure) when (operationFailure is not null
+                && cleanupFailure is IOException or UnauthorizedAccessException)
+            {
+                // Preserve the operation's original error if cleanup also fails.
+                operationFailure.Data["TemporaryFileCleanupError"] = cleanupFailure;
+            }
+        }
+    }
+
+    private static void ReplaceTemporaryFile(string temporaryPath, string destinationPath, bool overwrite)
+    {
+        FileAttributes? originalAttributes = null;
+        if (overwrite && File.Exists(destinationPath))
+        {
+            var attributes = File.GetAttributes(destinationPath);
+            if ((attributes & FileAttributes.ReadOnly) != 0)
+            {
+                File.SetAttributes(destinationPath, attributes & ~FileAttributes.ReadOnly);
+                originalAttributes = attributes;
+            }
+        }
+
+        try
+        {
+            File.Move(temporaryPath, destinationPath, overwrite);
+        }
+        catch (Exception exception)
+        {
+            if (originalAttributes is { } attributes)
+            {
+                try { File.SetAttributes(destinationPath, attributes); }
+                catch (Exception restoreFailure) when (restoreFailure is IOException or UnauthorizedAccessException)
+                {
+                    exception.Data["DestinationAttributeRestoreError"] = restoreFailure;
+                }
+            }
+            throw;
         }
     }
 }

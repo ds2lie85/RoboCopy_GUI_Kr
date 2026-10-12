@@ -46,6 +46,16 @@ public sealed class RobocopySummaryAggregator
         _operationCount++;
     }
 
+    public void AddFailedFile(long size, TimeSpan elapsed)
+    {
+        _files[0]++;
+        _files[4]++;
+        _bytes[0] += Math.Max(0, size);
+        _bytes[4] += Math.Max(0, size);
+        _elapsed += elapsed;
+        _operationCount++;
+    }
+
     public RobocopySummaryAggregate Build() => new(
         _directories.ToArray(),
         _files.ToArray(),

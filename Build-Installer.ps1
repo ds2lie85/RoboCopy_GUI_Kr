@@ -1,6 +1,7 @@
 param(
     [ValidateSet("win-x64")]
-    [string]$Runtime = "win-x64"
+    [string]$Runtime = "win-x64",
+    [switch]$KeepStaging
 )
 
 $ErrorActionPreference = "Stop"
@@ -11,9 +12,12 @@ $stagingRoot = Join-Path $installerRoot "staging"
 $frameworkPublishRoot = Join-Path $stagingRoot "app-framework"
 $offlinePublishRoot = Join-Path $stagingRoot "app-offline"
 $packageRoot = Join-Path $stagingRoot "package"
+$buildArtifactsRoot = Join-Path $stagingRoot "build"
 $frameworkPayloadZip = Join-Path $packageRoot "payload-framework.zip"
 $offlinePayloadZip = Join-Path $packageRoot "payload-offline.zip"
-$installerPath = Join-Path $installerRoot "RoboCopy_GUI_Kr_Setup_v1.0_x64.exe"
+[xml]$versionProperties = Get-Content -LiteralPath (Join-Path $repositoryRoot 'Directory.Build.props') -Raw
+$displayVersion = [string]$versionProperties.Project.PropertyGroup.InformationalVersion
+$installerPath = Join-Path $installerRoot "RoboCopy_GUI_Kr_Setup_v${displayVersion}_x64.exe"
 $projectPath = "src\RoboCopy_GUI_Kr\RoboCopy_GUI_Kr.csproj"
 $workerProjectPath = "src\RoboCopy_GUI_Kr.ElevatedWorker\RoboCopy_GUI_Kr.ElevatedWorker.csproj"
 $agentProjectPath = "src\RoboCopy_GUI_Kr.Agent\RoboCopy_GUI_Kr.Agent.csproj"
@@ -61,32 +65,32 @@ $dotnetExecutable = if (Test-Path -LiteralPath $localDotnet) {
 
 Push-Location $repositoryRoot
 try {
-    & $dotnetExecutable restore $projectPath -r $Runtime --configfile "NuGet.Config" --disable-parallel -m:1 -p:NuGetAudit=false
+    & $dotnetExecutable restore $projectPath -r $Runtime --artifacts-path $buildArtifactsRoot --configfile "NuGet.Config" --disable-parallel -m:1 -p:NuGetAudit=false
     if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed with exit code $LASTEXITCODE." }
 
-    & $dotnetExecutable publish $projectPath -c Release -r $Runtime -m:1 --no-restore --self-contained false `
+    & $dotnetExecutable publish $projectPath -c Release -r $Runtime --artifacts-path $buildArtifactsRoot -m:1 -p:UseSharedCompilation=false --no-restore --self-contained false `
         -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -o $frameworkPublishRoot
     if ($LASTEXITCODE -ne 0) { throw "framework-dependent publish failed with exit code $LASTEXITCODE." }
 
-    & $dotnetExecutable publish $projectPath -c Release -r $Runtime -m:1 --no-restore --self-contained true `
+    & $dotnetExecutable publish $projectPath -c Release -r $Runtime --artifacts-path $buildArtifactsRoot -m:1 -p:UseSharedCompilation=false --no-restore --self-contained true `
         -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -o $offlinePublishRoot
     if ($LASTEXITCODE -ne 0) { throw "offline self-contained publish failed with exit code $LASTEXITCODE." }
 
-    & $dotnetExecutable restore $workerProjectPath -r $Runtime --configfile "NuGet.Config" --disable-parallel -m:1 -p:NuGetAudit=false
+    & $dotnetExecutable restore $workerProjectPath -r $Runtime --artifacts-path $buildArtifactsRoot --configfile "NuGet.Config" --disable-parallel -m:1 -p:NuGetAudit=false
     if ($LASTEXITCODE -ne 0) { throw "elevated worker restore failed with exit code $LASTEXITCODE." }
-    & $dotnetExecutable publish $workerProjectPath -c Release -r $Runtime -m:1 --no-restore --self-contained false `
+    & $dotnetExecutable publish $workerProjectPath -c Release -r $Runtime --artifacts-path $buildArtifactsRoot -m:1 -p:UseSharedCompilation=false --no-restore --self-contained false `
         -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -o $frameworkPublishRoot
     if ($LASTEXITCODE -ne 0) { throw "framework elevated worker publish failed with exit code $LASTEXITCODE." }
-    & $dotnetExecutable publish $workerProjectPath -c Release -r $Runtime -m:1 --no-restore --self-contained true `
+    & $dotnetExecutable publish $workerProjectPath -c Release -r $Runtime --artifacts-path $buildArtifactsRoot -m:1 -p:UseSharedCompilation=false --no-restore --self-contained true `
         -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -o $offlinePublishRoot
     if ($LASTEXITCODE -ne 0) { throw "offline elevated worker publish failed with exit code $LASTEXITCODE." }
 
-    & $dotnetExecutable restore $agentProjectPath -r $Runtime --configfile "NuGet.Config" --disable-parallel -m:1 -p:NuGetAudit=false
+    & $dotnetExecutable restore $agentProjectPath -r $Runtime --artifacts-path $buildArtifactsRoot --configfile "NuGet.Config" --disable-parallel -m:1 -p:NuGetAudit=false
     if ($LASTEXITCODE -ne 0) { throw "agent restore failed with exit code $LASTEXITCODE." }
-    & $dotnetExecutable publish $agentProjectPath -c Release -r $Runtime -m:1 --no-restore --self-contained false `
+    & $dotnetExecutable publish $agentProjectPath -c Release -r $Runtime --artifacts-path $buildArtifactsRoot -m:1 -p:UseSharedCompilation=false --no-restore --self-contained false `
         -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -o $frameworkPublishRoot
     if ($LASTEXITCODE -ne 0) { throw "framework agent publish failed with exit code $LASTEXITCODE." }
-    & $dotnetExecutable publish $agentProjectPath -c Release -r $Runtime -m:1 --no-restore --self-contained true `
+    & $dotnetExecutable publish $agentProjectPath -c Release -r $Runtime --artifacts-path $buildArtifactsRoot -m:1 -p:UseSharedCompilation=false --no-restore --self-contained true `
         -p:PublishSingleFile=false -p:PublishTrimmed=false -p:DebugType=None -p:DebugSymbols=false -o $offlinePublishRoot
     if ($LASTEXITCODE -ne 0) { throw "offline agent publish failed with exit code $LASTEXITCODE." }
 } finally {
@@ -106,6 +110,8 @@ Compress-Archive -Path (Join-Path $frameworkPublishRoot "*") -DestinationPath $f
 Compress-Archive -Path (Join-Path $offlinePublishRoot "*") -DestinationPath $offlinePayloadZip -CompressionLevel Optimal -Force
 $installScript = Get-Content -LiteralPath (Join-Path $repositoryRoot "installer\Install.ps1") -Raw -Encoding UTF8
 [IO.File]::WriteAllText((Join-Path $packageRoot "Install.ps1"), $installScript, $utf8WithBom)
+$installerStrings = Get-Content -LiteralPath (Join-Path $repositoryRoot 'installer\InstallerStrings.ko-KR.psd1') -Raw -Encoding UTF8
+[IO.File]::WriteAllText((Join-Path $packageRoot 'InstallerStrings.ko-KR.psd1'), $installerStrings, $utf8WithBom)
 
 $iexpressPath = Join-Path $env:WINDIR "System32\iexpress.exe"
 if (-not (Test-Path -LiteralPath $iexpressPath)) {
@@ -130,7 +136,7 @@ InstallPrompt=
 DisplayLicense=
 FinishMessage=
 TargetName=$installerPath
-FriendlyName=RoboCopy_GUI_Kr 1.0 Setup
+FriendlyName=RoboCopy_GUI_Kr $displayVersion Setup
 AppLaunched=powershell.exe -NoProfile -ExecutionPolicy Bypass -File Install.ps1
 PostInstallCmd=<None>
 AdminQuietInstCmd=
@@ -140,12 +146,14 @@ SourceFiles=SourceFiles
 FILE0=Install.ps1
 FILE1=payload-framework.zip
 FILE2=payload-offline.zip
+FILE3=InstallerStrings.ko-KR.psd1
 [SourceFiles]
 SourceFiles0=$escapedPackageRoot
 [SourceFiles0]
 %FILE0%=
 %FILE1%=
 %FILE2%=
+%FILE3%=
 "@
 $sedPath = Join-Path $stagingRoot "installer.sed"
 [IO.File]::WriteAllText($sedPath, $sedContent, [Text.Encoding]::Unicode)
@@ -181,6 +189,9 @@ Write-Host "Online/runtime-present payload size: $frameworkBytes bytes"
 Write-Host "Offline self-contained payload size: $offlineBytes bytes"
 Write-Host "Installer size: $installerBytes bytes"
 Write-Host "Installer: $installerPath"
+$installerHash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant()
+[IO.File]::WriteAllText((Join-Path $installerRoot 'SHA256SUMS.txt'),
+    "$installerHash  $([IO.Path]::GetFileName($installerPath))`r`n", [Text.UTF8Encoding]::new($false))
 
 Assert-PathUnderArtifacts $stagingRoot
-Remove-Item -LiteralPath $stagingRoot -Recurse -Force
+if (-not $KeepStaging) { Remove-Item -LiteralPath $stagingRoot -Recurse -Force }

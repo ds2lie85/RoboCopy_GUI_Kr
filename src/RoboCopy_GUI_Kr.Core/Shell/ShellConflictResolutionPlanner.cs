@@ -49,7 +49,9 @@ public sealed class ShellConflictResolutionPlanner
                     break;
 
                 case ShellConflictDecision.Overwrite:
-                    var winner = resolution.Group.Sources.FirstOrDefault(source => string.Equals(
+                    var winner = resolution.WinnerPath is null && resolution.Group.Sources.Count == 1
+                        ? resolution.Group.Sources[0]
+                        : resolution.Group.Sources.FirstOrDefault(source => string.Equals(
                         source.SourcePath,
                         resolution.WinnerPath,
                         StringComparison.OrdinalIgnoreCase));

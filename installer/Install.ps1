@@ -1,9 +1,12 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
+Import-LocalizedData -BindingVariable installerStrings -BaseDirectory $PSScriptRoot -FileName 'InstallerStrings.ko-KR.psd1'
+
+function Get-InstallerText([string]$key) { return $installerStrings[$key] }
 
 $appName = "RoboCopy_GUI_Kr"
-$displayVersion = "1.0"
+$displayVersion = "1.1"
 $installRoot = Join-Path $env:LOCALAPPDATA "Programs\$appName"
 $frameworkPayloadPath = Join-Path $PSScriptRoot "payload-framework.zip"
 $offlinePayloadPath = Join-Path $PSScriptRoot "payload-offline.zip"
@@ -92,6 +95,39 @@ function Assert-SafeInstallPath {
     }
 }
 
+function Test-DeveloperModeEnabled {
+    $registry = [Microsoft.Win32.RegistryKey]::OpenBaseKey(
+        [Microsoft.Win32.RegistryHive]::LocalMachine, [Microsoft.Win32.RegistryView]::Registry64)
+    try {
+        $key = $registry.OpenSubKey('SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock')
+        if ($null -eq $key) { return $false }
+        try { return $key.GetValue('AllowDevelopmentWithoutDevLicense') -eq 1 }
+        finally { $key.Dispose() }
+    } finally { $registry.Dispose() }
+}
+
+function Enable-SelectedDeveloperMode {
+    if (Test-DeveloperModeEnabled) { return }
+    $helper = Join-Path $installRoot 'ExplorerPackage\Enable-DeveloperMode.ps1'
+    $powershell = Join-Path ([Environment]::GetFolderPath('System')) 'WindowsPowerShell\v1.0\powershell.exe'
+    # Only the setting worker is elevated. Package registration stays with the
+    # installing user, even if UAC is approved using a different administrator.
+    $arguments = '-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "' + $helper + '"'
+    $process = Start-Process -FilePath $powershell -ArgumentList $arguments -Verb RunAs -WindowStyle Hidden -Wait -PassThru
+    if ($process.ExitCode -ne 0 -or -not (Test-DeveloperModeEnabled)) {
+        throw (Get-InstallerText 'DeveloperModeEnableFailed')
+    }
+}
+
+function Set-Windows11ExplorerIntegration([bool]$registerExplorerMenu, [bool]$enableDeveloperMode, [int]$windowsBuild = [Environment]::OSVersion.Version.Build) {
+    if (-not $registerExplorerMenu -or $windowsBuild -lt 22000) { return '' }
+    if ($enableDeveloperMode) { Enable-SelectedDeveloperMode }
+    if (-not (Test-DeveloperModeEnabled)) { return (Get-InstallerText 'ModernMenuLegacy') }
+    $registrationScript = Join-Path $installRoot 'ExplorerPackage\Register-ExplorerPackage.ps1'
+    & $registrationScript -Installed
+    return (Get-InstallerText 'ModernMenuRegistered')
+}
+
 function Install-DesktopRuntime8 {
     $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("RoboCopy_GUI_Kr-" + [Guid]::NewGuid().ToString("N"))
     $runtimeInstaller = Join-Path $temporaryRoot "windowsdesktop-runtime-8-win-x64.exe"
@@ -156,8 +192,8 @@ $frameworkPayloadAvailable = Test-Path -LiteralPath $frameworkPayloadPath
 $offlinePayloadAvailable = Test-Path -LiteralPath $offlinePayloadPath
 
 [xml]$xaml = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Title="RoboCopy GUI 한국어 1.0 설치"
-        Width="760" Height="620" MinWidth="680" MinHeight="570" WindowStartupLocation="CenterScreen"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Title="RoboCopy GUI 한국어 $displayVersion 설치"
+        Width="760" Height="770" MinWidth="680" MinHeight="730" WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize" Background="#F4F6F8">
   <Grid Margin="24">
     <Grid.RowDefinitions>
@@ -165,7 +201,7 @@ $offlinePayloadAvailable = Test-Path -LiteralPath $offlinePayloadPath
       <RowDefinition Height="8"/><RowDefinition Height="Auto"/><RowDefinition Height="16"/>
       <RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
-    <TextBlock Grid.Row="0" Text="RoboCopy GUI 한국어 1.0 설치" FontSize="25" FontWeight="Bold" Foreground="#155A86"/>
+    <TextBlock Grid.Row="0" Text="RoboCopy GUI 한국어 $displayVersion 설치" FontSize="25" FontWeight="Bold" Foreground="#155A86"/>
     <TextBlock Grid.Row="2" Text="설치 환경을 자동 검사했습니다. 필요한 구성요소와 설치할 항목을 확인해 주세요."
                FontSize="14" TextWrapping="Wrap"/>
     <Border Grid.Row="4" Background="White" BorderBrush="#CDD6DD" BorderThickness="1" CornerRadius="6" Padding="16">
@@ -185,6 +221,8 @@ $offlinePayloadAvailable = Test-Path -LiteralPath $offlinePayloadPath
         <CheckBox Name="StartMenuCheckBox" Content="시작 메뉴 바로가기 만들기" IsChecked="True" Margin="0,3"/>
         <CheckBox Name="DesktopCheckBox" Content="바탕 화면 바로가기 만들기" IsChecked="False" Margin="0,3"/>
         <CheckBox Name="ExplorerCheckBox" Content="파일 탐색기 우클릭 메뉴 연동" IsChecked="True" Margin="0,3"/>
+        <CheckBox Name="DeveloperModeCheckBox" IsChecked="False" Margin="0,6,0,3"/>
+        <TextBlock Name="DeveloperModeWarningText" Margin="24,0,0,8" Foreground="#9A3412" TextWrapping="Wrap"/>
         <CheckBox Name="LaunchCheckBox" Content="설치 완료 후 프로그램 실행" IsChecked="True" Margin="0,3"/>
       </StackPanel>
     </Border>
@@ -208,6 +246,16 @@ $runtimeStatusText = $window.FindName("RuntimeStatusText")
 $startMenuCheckBox = $window.FindName("StartMenuCheckBox")
 $desktopCheckBox = $window.FindName("DesktopCheckBox")
 $explorerCheckBox = $window.FindName("ExplorerCheckBox")
+$developerModeCheckBox = $window.FindName('DeveloperModeCheckBox')
+$developerModeWarningText = $window.FindName('DeveloperModeWarningText')
+$developerModeCheckBox.Content = Get-InstallerText 'DeveloperModeOption'
+$developerModeWarningText.Text = Get-InstallerText 'DeveloperModeWarning'
+$windows11 = [Environment]::OSVersion.Version.Build -ge 22000
+$developerModeCheckBox.Visibility = if ($windows11) { 'Visible' } else { 'Collapsed' }
+$developerModeWarningText.Visibility = $developerModeCheckBox.Visibility
+$developerModeCheckBox.IsEnabled = $windows11 -and $explorerCheckBox.IsChecked -eq $true
+$explorerCheckBox.Add_Unchecked({ $developerModeCheckBox.IsChecked = $false; $developerModeCheckBox.IsEnabled = $false })
+$explorerCheckBox.Add_Checked({ $developerModeCheckBox.IsEnabled = $windows11 })
 $launchCheckBox = $window.FindName("LaunchCheckBox")
 $installStatusText = $window.FindName("InstallStatusText")
 $installButton = $window.FindName("InstallButton")
@@ -237,6 +285,13 @@ if (-not $installButton.IsEnabled) { $installStatusText.Text = "필수 환경을
 $cancelButton.Add_Click({ $window.DialogResult = $false; $window.Close() })
 $installButton.Add_Click({
     try {
+        $enableDeveloperMode = $developerModeCheckBox.IsChecked -eq $true -and $explorerCheckBox.IsChecked -eq $true -and $windows11
+        if ($enableDeveloperMode) {
+            $confirmation = [System.Windows.MessageBox]::Show($window,
+                (Get-InstallerText 'DeveloperModeConfirm'), (Get-InstallerText 'DeveloperModeConfirmTitle'),
+                [System.Windows.MessageBoxButton]::YesNo, [System.Windows.MessageBoxImage]::Warning)
+            if ($confirmation -ne [System.Windows.MessageBoxResult]::Yes) { return }
+        }
         $installButton.IsEnabled = $false
         $cancelButton.IsEnabled = $false
         $selectedPayloadPath = $frameworkPayloadPath
@@ -268,7 +323,14 @@ $installButton.Add_Click({
             return
         }
 
-        [System.Windows.MessageBox]::Show("설치가 완료되었습니다.", "$appName 설치",
+        $menuStatus = ''
+        try {
+            $menuStatus = Set-Windows11ExplorerIntegration ($explorerCheckBox.IsChecked -eq $true) $enableDeveloperMode
+        } catch {
+            $menuStatus = (Get-InstallerText 'ModernMenuFailed') + "`n" + $_.Exception.Message
+        }
+        $completionText = (Get-InstallerText 'InstallCompleted') + "`n`n" + $menuStatus
+        [System.Windows.MessageBox]::Show($completionText, "$appName 설치",
             [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information) | Out-Null
         if ($launchCheckBox.IsChecked -eq $true) { Start-Process -FilePath $executablePath }
         $window.DialogResult = $true

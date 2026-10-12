@@ -31,6 +31,7 @@ public sealed record ShellCopyConflictGroup(
     ShellExistingDestination? ExistingDestination)
 {
     public string FileName => Path.GetFileName(DestinationPath);
+    public bool RequiresOverwriteSelection => Sources.Count > 1;
 }
 
 public sealed record ShellCopyConflictAnalysis(

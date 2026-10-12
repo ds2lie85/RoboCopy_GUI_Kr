@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Add-Type -AssemblyName PresentationFramework
 
 $appName = "RoboCopy_GUI_Kr"
@@ -37,6 +37,11 @@ $expectedInstallRoot = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA "Prog
 if (-not [string]::Equals($resolvedInstallRoot, $expectedInstallRoot, [StringComparison]::OrdinalIgnoreCase)) {
     throw "설치 경로 안전성 검증에 실패했습니다."
 }
+
+# Remove only this installation's identity. Developer Mode is a machine setting
+# shared by other software and is intentionally left as the user configured it.
+$packageRegistration = Join-Path $resolvedInstallRoot 'ExplorerPackage\Register-ExplorerPackage.ps1'
+if (Test-Path -LiteralPath $packageRegistration) { & $packageRegistration -Unregister -Installed }
 
 if (Test-Path -LiteralPath $shortcutPath) {
     Remove-Item -LiteralPath $shortcutPath -Force

@@ -1,4 +1,12 @@
-# RoboCopy_GUI_Kr 1.0
+# RoboCopy_GUI_Kr 1.1
+
+2026-10-12 통합 재빌드도 제품 버전 **1.1**을 유지합니다. 미니 UI의 오류 관리 자동 전환, 원본·대상 및 자기 실행 파일 잠금 진단, 하위 동기화 작업의 삭제·유지 확인 통합을 포함합니다. 같은 버전의 이전 설치기와는 `SHA256SUMS.txt`로 구분하세요.
+
+The October 12, 2026 rebuild keeps version **1.1** and includes automatic error-management recovery, source/destination lock diagnosis, and one combined deletion review for queued backup jobs. Use the published SHA-256 checksums to distinguish it from earlier 1.1 installers.
+
+성능 측정 후 임시 출력의 순간적인 파일 잠금은 제한적으로 재시도하여 정리합니다. 정리 범위는 측정용 임시 폴더로 제한되며 원본 데이터나 권한은 변경하지 않습니다.
+
+1.1 변경 내역은 [릴리스 설명](docs/releases/v1.1.0.md)을 참고하세요. Windows 11 기본 메뉴는 선택한 파일의 `Robocopy로 복사`와 대상 폴더 배경의 붙여넣기 메뉴를 제공합니다. 설치기의 개발자 모드 활성화 옵션은 기본 미체크이며 PC 전체 설정 변경 및 위험 경고와 추가 승인을 표시합니다. 활성화하지 않거나 기본 메뉴 등록에 실패하면 기존 레거시 메뉴를 사용할 수 있습니다.
 
 A Windows desktop application built with .NET 8 and WPF that provides a Korean interface for Windows `robocopy.exe`. It supports copying, verified moves, and one-way backup or continuous synchronization. Maintained by **ds2lie85**.
 
@@ -6,9 +14,9 @@ Windows `robocopy.exe`를 한국어 UI로 사용할 수 있는 .NET 8 WPF 데스
 
 ## Installation / 설치
 
-Download `RoboCopy_GUI_Kr_Setup_v1.0_x64.exe` from the repository's **Releases** page on GitHub or GitLab and run it. The installer checks Windows, Robocopy, connectivity, and .NET 8 Desktop Runtime. With an internet connection, it can offer Microsoft's official runtime installer. For offline use or a failed runtime installation, it uses the included self-contained application. Select shortcuts, Explorer integration, and whether to launch the app after installation.
+Download `RoboCopy_GUI_Kr_Setup_v1.1_x64.exe` from the repository's **Releases** page on GitHub or GitLab and run it. The installer checks Windows, Robocopy, connectivity, and .NET 8 Desktop Runtime. With an internet connection, it can offer Microsoft's official runtime installer. For offline use or a failed runtime installation, it uses the included self-contained application. Select shortcuts, Explorer integration, and whether to launch the app after installation.
 
-GitHub 또는 GitLab 저장소의 **Releases** 페이지에서 `RoboCopy_GUI_Kr_Setup_v1.0_x64.exe`를 내려받아 실행하세요. 설치기는 Windows, Robocopy, 인터넷 연결 및 .NET 8 Desktop Runtime을 확인합니다. 인터넷에 연결되어 있으면 Microsoft 공식 런타임 설치를 선택할 수 있습니다. 오프라인이거나 런타임 설치에 실패하면 포함된 자체 포함 앱을 사용합니다. 바로가기, 탐색기 연동 및 설치 후 실행 여부를 선택할 수 있습니다.
+GitHub 또는 GitLab 저장소의 **Releases** 페이지에서 `RoboCopy_GUI_Kr_Setup_v1.1_x64.exe`를 내려받아 실행하세요. 설치기는 Windows, Robocopy, 인터넷 연결 및 .NET 8 Desktop Runtime을 확인합니다. 인터넷에 연결되어 있으면 Microsoft 공식 런타임 설치를 선택할 수 있습니다. 오프라인이거나 런타임 설치에 실패하면 포함된 자체 포함 앱을 사용합니다. 바로가기, 탐색기 연동 및 설치 후 실행 여부를 선택할 수 있습니다.
 
 The declared minimum operating system is **Windows 10 version 1607, x64 (build 14393)**. Windows 11 x64 is also supported. A separate .NET SDK is not required for the installed application. Windows 7/8.1 and native ARM64 builds are not provided. The installer has been successfully installed and run on another computer by the maintainer; this does not represent testing on every supported Windows release.
 
@@ -46,6 +54,10 @@ Move mode first copies files and compares source and destination contents byte b
 
 ### One-way synchronization / 단방향 동기화
 
+Queued backup jobs share one destination-only review, displayed relative to their common destination root. Keep/delete decisions apply to the included subfolder jobs; keeping everything is remembered too. Unselected folders stay outside the review. New or edited jobs require a new decision. Nonrecursive file jobs do not inspect destination subfolders.
+
+백업 대기열의 대상 전용 항목을 공통 최상위 대상 경로 기준으로 한 번 확인합니다. 삭제·유지 선택은 포함된 하위 작업에 적용하고 모두 유지도 기억합니다. 선택하지 않은 폴더는 검토하지 않으며 새로 추가하거나 수정한 작업은 다시 확인합니다. 비재귀 파일 작업은 대상 하위 폴더를 검사하지 않습니다.
+
 Backup mode copies new or changed source files and lets you select whether to delete or keep destination-only items. Continuous mode uses a separate tray agent for multiple tasks, login startup, configurable scan intervals/time windows, battery and metered-network conditions, and exclusions/link options. Continuous mode always saves logs and enables restartable copies without automatic retries.
 
 백업 모드는 원본의 신규·변경 파일을 반영하고 대상 전용 항목의 삭제·유지를 선택할 수 있습니다. 지속 모드는 별도 트레이 에이전트에서 복수 작업, 로그인 시 시작, 감시 간격·시간대, 배터리·종량제 네트워크 조건 및 예외·링크 옵션을 관리합니다. 지속 모드는 로그 저장과 재시작 가능한 복사를 항상 적용하며 자동 재시도는 사용하지 않습니다.
@@ -59,6 +71,10 @@ Continuous mode offers a low-thread recommendation reaching 70% of the best benc
 지속 모드는 최고 측정 속도의 70% 이상인 후보 중 낮은 스레드 수를 추천하는 모드와 95% 기준 성능 추천 모드를 제공합니다. 이 버전은 단방향 동기화를 구현하며 양방향 동기화는 제공하지 않습니다.
 
 ### Errors, privileges, and safety / 오류·권한·안전성
+
+When a mini-window job finishes with failures or unresolved files, the main window and error manager open automatically. Lock checks inspect both source and destination and detect the running application's executable/modules. A self-used destination cannot be overwritten by elevation: run the complete application folder outside the copy source/destination, close the old instance normally, and retry. An empty process lookup does not guarantee that no lock exists.
+
+미니창 작업이 실패하거나 미해결 오류 파일이 남으면 메인창과 오류 파일 관리 창을 자동으로 표시합니다. 잠금 조회는 원본·대상 모두 검사하고 현재 앱의 실행 파일·모듈도 확인합니다. 자기 실행 파일인 대상은 관리자 권한으로도 덮어쓸 수 없으므로 프로그램 전체를 원본·대상 밖에서 실행하고 기존 앱을 정상 종료한 뒤 재시도하세요. 잠금 조회 결과가 없어도 잠금이 없다는 보장은 아닙니다.
 
 Inspect failed files with error codes and paths, select individual files for non-recursive retries, and track retry state. Windows Restart Manager identifies locking processes. A normal shutdown request requires confirmation; forced termination becomes available only after normal shutdown fails and requires a separate explicit warning approval.
 
@@ -99,11 +115,14 @@ For a project-local SDK, run `Setup-LocalSdk.ps1`, then use `.\.dotnet\dotnet.ex
 .\Setup-LocalSdk.ps1
 .\Build.ps1
 .\Build-Installer.ps1
+.\Prepare-Release.ps1
 ```
 
-The installer output is `artifacts\installer\RoboCopy_GUI_Kr_Setup_v1.0_x64.exe`. Build it on Windows with PowerShell and IExpress. Both online and offline payloads include project documentation and runtime license notices. Runtime DLLs account for most of the installer size.
+The installer output is `artifacts\installer\RoboCopy_GUI_Kr_Setup_v1.1_x64.exe`. Build it on Windows with PowerShell and IExpress. Both online and offline payloads include project documentation and runtime license notices. Runtime DLLs account for most of the installer size.
 
-설치기 출력은 `artifacts\installer\RoboCopy_GUI_Kr_Setup_v1.0_x64.exe`입니다. PowerShell과 IExpress를 갖춘 Windows에서 빌드하세요. 온라인·오프라인 페이로드 모두 프로젝트 문서와 런타임 라이선스 고지를 포함합니다. 설치기 용량의 대부분은 런타임 DLL입니다.
+설치기 출력은 `artifacts\installer\RoboCopy_GUI_Kr_Setup_v1.1_x64.exe`입니다. PowerShell과 IExpress를 갖춘 Windows에서 빌드하세요. 온라인·오프라인 페이로드 모두 프로젝트 문서와 런타임 라이선스 고지를 포함합니다. 설치기 용량의 대부분은 런타임 DLL입니다.
+
+`Prepare-Release.ps1`은 기존 `artifacts/release/v1.1.0`에 설치기, 소스 ZIP, 릴리스 설명과 SHA-256 체크섬을 모읍니다. 소스와 바이너리를 같은 재빌드로 맞춘 뒤 두 서비스에 동일한 파일을 업로드하세요. 원격 업로드는 스크립트에 포함하지 않습니다.
 
 ## Repository layout / 프로젝트 구성
 

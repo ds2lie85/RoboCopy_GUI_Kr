@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <None Update="Fixtures\Test-InstallerDeveloperMode.ps1" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -188,6 +189,7 @@
     <None Include="..\..\installer\Install.ps1"
           Link="Fixtures\Install.ps1"
           CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\installer\InstallerStrings.ko-KR.psd1" Link="Fixtures\InstallerStrings.ko-KR.psd1" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

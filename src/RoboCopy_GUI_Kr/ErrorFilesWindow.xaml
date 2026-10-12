@@ -13,7 +13,11 @@
             <RowDefinition Height="12" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text="{StaticResource ErrorFilesInstruction}" Foreground="{StaticResource SubtleTextBrush}" TextWrapping="Wrap" />
+        <StackPanel>
+            <TextBlock Text="{StaticResource ErrorFilesInstruction}" Foreground="{StaticResource SubtleTextBrush}" TextWrapping="Wrap" />
+            <TextBlock x:Name="DiagnosisTextBlock" Text="{StaticResource SelfOverwriteGuidance}"
+                       TextWrapping="Wrap" Margin="0,8,0,0" Visibility="Collapsed" />
+        </StackPanel>
         <DataGrid x:Name="ErrorDataGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
                   CanUserAddRows="False" SelectionMode="Extended" SelectionUnit="FullRow"
                   HeadersVisibility="Column" GridLinesVisibility="None">

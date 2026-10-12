@@ -34,9 +34,10 @@ public partial class ErrorFilesWindow : Window
 
     private void RetrySelected_Click(object sender, RoutedEventArgs e)
     {
-        var selected = SelectedRows().Where(row => row.CanRetry).ToArray();
+        var selected = RetryableRows();
         if (selected.Length == 0)
         {
+            if (SelectedRows().Any(row => row.CanRetry)) return;
             ShowSelectItemsMessage();
             return;
         }
@@ -47,11 +48,13 @@ public partial class ErrorFilesWindow : Window
 
     private void RetrySelectedAsAdministrator_Click(object sender, RoutedEventArgs e)
     {
-        var selected = SelectedRows()
+        var selected = RetryableRows()
             .Where(row => row.CanRetry && row.Item.Category == RobocopyErrorCategory.AccessDenied)
             .ToArray();
         if (selected.Length == 0)
         {
+            if (SelectedRows().Any(row => row.CanRetry
+                && RestartManagerService.IsCurrentProcessUsingFile(row.DestinationPath))) return;
             MessageBox.Show(this, GetText("SelectAccessDeniedFiles"), GetText("ErrorFilesTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
@@ -59,7 +62,7 @@ public partial class ErrorFilesWindow : Window
         ElevatedRetryRequested?.Invoke(this, new RetryErrorsRequestedEventArgs(selected));
     }
 
-    private void CheckLockingProcesses_Click(object sender, RoutedEventArgs e)
+    private async void CheckLockingProcesses_Click(object sender, RoutedEventArgs e)
     {
         var selected = SelectedRows();
         if (selected.Length == 0)
@@ -70,12 +73,9 @@ public partial class ErrorFilesWindow : Window
 
         try
         {
-            var paths = selected
-                .Select(row => File.Exists(row.SourcePath) ? row.SourcePath : row.DestinationPath)
-                .Where(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-            var processes = _restartManager.GetLockingProcesses(paths);
+            var paths = ErrorFileLockPaths.Collect(selected.Select(row => row.Item));
+            var processes = await Task.Run(() => _restartManager.GetLockingProcesses(paths));
+            if (!IsVisible) return;
             if (processes.Count == 0)
             {
                 MessageBox.Show(this, GetText("NoLockingProcesses"), GetText("LockingProcessesTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -86,7 +86,8 @@ public partial class ErrorFilesWindow : Window
             _ = window.ShowDialog();
             if (window.RetryRequested)
             {
-                var retryRows = selected.Where(row => row.CanRetry).ToArray();
+                var retryRows = selected.Where(row => row.CanRetry
+                    && !RestartManagerService.IsCurrentProcessUsingFile(row.DestinationPath)).ToArray();
                 if (retryRows.Length > 0)
                 {
                     RetryRequested?.Invoke(this, new RetryErrorsRequestedEventArgs(retryRows));
@@ -135,6 +136,17 @@ public partial class ErrorFilesWindow : Window
 
     private ErrorFileRow[] SelectedRows() => ErrorDataGrid.SelectedItems.Cast<ErrorFileRow>().ToArray();
 
+    private ErrorFileRow[] RetryableRows()
+    {
+        var selected = SelectedRows().Where(row => row.CanRetry).ToArray();
+        if (selected.Any(row => RestartManagerService.IsCurrentProcessUsingFile(row.DestinationPath)))
+        {
+            MessageBox.Show(this, GetText("SelfOverwriteGuidance"), GetText("ErrorFilesTitle"),
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        return selected.Where(row => !RestartManagerService.IsCurrentProcessUsingFile(row.DestinationPath)).ToArray();
+    }
+
     private void ShowSelectItemsMessage() =>
         MessageBox.Show(this, GetText("SelectErrorFiles"), GetText("ErrorFilesTitle"), MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -170,6 +182,9 @@ public partial class ErrorFilesWindow : Window
             _rows.Count,
             _rows.Count - resolved,
             resolved);
+        DiagnosisTextBlock.Visibility = _rows.Any(row => row.CanRetry
+            && RestartManagerService.IsCurrentProcessUsingFile(row.DestinationPath))
+            ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void Window_Closed(object? sender, EventArgs e)

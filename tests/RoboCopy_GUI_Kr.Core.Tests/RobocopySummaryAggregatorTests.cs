@@ -5,6 +5,19 @@ namespace RoboCopy_GUI_Kr.Core.Tests;
 public sealed class RobocopySummaryAggregatorTests
 {
     [Fact]
+    public void FailedDirectFileRemainsInSummaryAfterLaterSuccess()
+    {
+        var aggregator = new RobocopySummaryAggregator();
+        aggregator.AddFailedFile(170, TimeSpan.FromSeconds(1));
+        aggregator.AddCopiedFile(160, TimeSpan.FromSeconds(2));
+        var result = aggregator.Build();
+        Assert.Equal(2, result.OperationCount);
+        Assert.Equal(2, result.Files[0]);
+        Assert.Equal(1, result.Files[1]);
+        Assert.Equal(1, result.Files[4]);
+        Assert.Equal(170, result.Bytes[4]);
+    }
+    [Fact]
     public void Build_SumsMultipleRobocopyJobsAndDirectFileCopies()
     {
         var aggregator = new RobocopySummaryAggregator();

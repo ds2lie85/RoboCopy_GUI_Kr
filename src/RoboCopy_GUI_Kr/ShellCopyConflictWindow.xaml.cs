@@ -49,7 +49,8 @@ public partial class ShellCopyConflictWindow : Window
 
     private void Apply_Click(object sender, RoutedEventArgs e)
     {
-        var overwriteRows = Rows.Where(row => row.Decision == ShellConflictDecision.Overwrite).ToArray();
+        var overwriteRows = Rows.Where(row => row.Decision == ShellConflictDecision.Overwrite
+            && row.Group.RequiresOverwriteSelection).ToArray();
         IReadOnlyDictionary<string, string> winners = new Dictionary<string, string>();
         if (overwriteRows.Length > 0)
         {

@@ -73,6 +73,7 @@ function Copy-SourceSnapshot([string]$destinationRoot) {
         "AGENTS.md",
         "Build.ps1",
         "Build-Installer.ps1",
+        "Prepare-Release.ps1",
         "Directory.Build.props",
         "DEVELOPMENT_STATUS.md",
         "DEVELOPMENT_TOOLS.md",
@@ -101,9 +102,10 @@ function Copy-SourceSnapshot([string]$destinationRoot) {
         $treeRoot = Join-Path $repositoryRoot $treeName
         Get-ChildItem -LiteralPath $treeRoot -File -Recurse -ErrorAction SilentlyContinue |
             Where-Object {
-                ($_.FullName -notmatch '[\\/](bin|obj)[\\/]') -and
+                ($_.FullName -notmatch '[\\/](bin|obj|TestResults)[\\/]') -and
                 ($_.FullName -notmatch '[\\/]test-assets[\\/].*[\\/]destination([\\/]|$)') -and
                 ($_.Name -notin @(".lock-process-id", ".lock-ready", ".release-lock")) -and
+                ($_.Name -notmatch '_wpftmp\.csproj$') -and
                 ($_.FullName -notmatch '[\\/]test-assets[\\/]elevated-retry[\\/](source|destination)([\\/]|$)')
             } |
             ForEach-Object {
@@ -176,8 +178,25 @@ try {
     & (Join-Path $repositoryRoot "installer\Copy-DistributionNotices.ps1") -PublishDirectory $developmentAppRoot
     Register-DevelopmentExplorerMenu (Join-Path $developmentAppRoot "RoboCopy_GUI_Kr.exe")
 
+    if ([Environment]::OSVersion.Version.Build -ge 22000) {
+        try {
+            & (Join-Path $developmentAppRoot "ExplorerPackage\Register-ExplorerPackage.ps1")
+            Write-Host "Windows 11 Explorer development identity registered."
+        } catch {
+            # Compilation still succeeds when the machine disallows loose development packages.
+            # Preserve diagnostics; never enable Developer Mode or install certificates here.
+            $diagnostic = $_ | Out-String
+            Set-Content -LiteralPath (Join-Path $developmentRoot 'ExplorerPackage-registration.log') -Value $diagnostic -Encoding UTF8
+            Write-Warning "Windows 11 menu registration failed. See ExplorerPackage-registration.log. Legacy menu remains available. $diagnostic"
+        }
+    }
+
     Copy-Item -Path (Join-Path $repositoryRoot "tests\RoboCopy_GUI_Kr.Core.Tests\bin\Release\net8.0\*") `
         -Destination $developmentTestRoot -Recurse -Force
+    $windowsTestRoot = Join-Path $developmentTestRoot 'windows'
+    New-Item -ItemType Directory -Path $windowsTestRoot -Force | Out-Null
+    Copy-Item -Path (Join-Path $repositoryRoot 'tests\RoboCopy_GUI_Kr.Windows.Tests\bin\Release\net8.0-windows\*') `
+        -Destination $windowsTestRoot -Recurse -Force
     Copy-SourceSnapshot $developmentSourceRoot
 
     $developmentBytes = (Get-ChildItem -LiteralPath $developmentRoot -File -Recurse | Measure-Object Length -Sum).Sum

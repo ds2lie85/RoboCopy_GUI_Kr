@@ -5,6 +5,33 @@ namespace RoboCopy_GUI_Kr.Core.Tests;
 public sealed class MtBenchmarkServiceTests
 {
     [Fact]
+    public async Task CleanupRetriesTransientSharingViolationWithoutDeletingSiblingData()
+    {
+        var root = Path.Combine(AppContext.BaseDirectory, ".mt-benchmark", Guid.NewGuid().ToString("N"));
+        var benchmark = Directory.CreateDirectory(Path.Combine(root, "benchmark")).FullName;
+        var file = Path.Combine(benchmark, "locked.bin");
+        File.WriteAllText(file, "temporary");
+        var retained = Path.Combine(root, "original.txt");
+        File.WriteAllText(retained, "original");
+        using var handle = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None);
+        try
+        {
+            var cleanup = Cleanup(benchmark, benchmark);
+            Assert.False(cleanup.IsCompleted);
+            handle.Dispose();
+            await cleanup;
+            Assert.False(Directory.Exists(benchmark));
+            Assert.Equal("original", File.ReadAllText(retained));
+            await Assert.ThrowsAsync<ArgumentException>(() => Cleanup(benchmark, root));
+        }
+        finally { handle.Dispose(); Directory.Delete(root, true); }
+    }
+
+    private static Task Cleanup(string root, string path) => (Task)typeof(MtBenchmarkService)
+        .GetMethod("DeleteBenchmarkDirectoryAsync", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!
+        .Invoke(null, [root, path])!;
+
+    [Fact]
     public async Task RunAsync_SkipsExclusivelyLockedSourceFile()
     {
         var testRoot = Path.Combine(AppContext.BaseDirectory, ".mt-benchmark", Guid.NewGuid().ToString("N"));

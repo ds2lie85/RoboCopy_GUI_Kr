@@ -11,4 +11,5 @@ internal sealed record MiniUiState(
     bool IsIndeterminate,
     bool IsPaused,
     bool CanPauseOrResume,
-    bool IsCompleted);
+    bool IsCompleted,
+    bool HasFailedJobs);

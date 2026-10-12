@@ -92,7 +92,7 @@ public sealed class MtBenchmarkService
             }
 
             sequentialMeasurement = new MtBenchmarkMeasurement(1, sequentialBytes, sequentialStopwatch.Elapsed);
-            Directory.Delete(sequentialDirectory, recursive: true);
+            await DeleteBenchmarkDirectoryAsync(benchmarkRoot, sequentialDirectory).ConfigureAwait(false);
 
             for (var index = 0; index < candidates.Count; index++)
             {
@@ -134,7 +134,7 @@ public sealed class MtBenchmarkService
                     copiedBytes,
                     stopwatch.Elapsed);
                 measurements.Add(measurement);
-                Directory.Delete(candidateDirectory, recursive: true);
+                await DeleteBenchmarkDirectoryAsync(benchmarkRoot, candidateDirectory).ConfigureAwait(false);
 
                 if (measurements.Count >= 2)
                 {
@@ -156,7 +156,7 @@ public sealed class MtBenchmarkService
         {
             if (Directory.Exists(benchmarkRoot))
             {
-                Directory.Delete(benchmarkRoot, recursive: true);
+                await DeleteBenchmarkDirectoryAsync(benchmarkRoot, benchmarkRoot).ConfigureAwait(false);
             }
         }
 
@@ -171,6 +171,31 @@ public sealed class MtBenchmarkService
             sampleSet.MixedSamples.Sum(sample => sample.Length),
             sampleSet.MixedSamples.Count,
             sequentialMeasurement);
+    }
+
+    private static async Task DeleteBenchmarkDirectoryAsync(string benchmarkRoot, string path)
+    {
+        var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(benchmarkRoot));
+        var target = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+        if (!target.Equals(root, StringComparison.OrdinalIgnoreCase)
+            && !target.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("Cleanup target is outside the benchmark directory.", nameof(path));
+
+        for (var attempt = 0; ; attempt++)
+        {
+            try
+            {
+                if (Directory.Exists(target)) Directory.Delete(target, recursive: true);
+                return;
+            }
+            catch (DirectoryNotFoundException) { return; }
+            catch (IOException exception) when (attempt < 7 && (exception.HResult & 0xffff) is 32 or 33)
+            {
+                // Temporary file users (e.g. scanners) may briefly retain handles after
+                // our streams close. Never force-close them or alter access permissions.
+                await Task.Delay(100 * (attempt + 1)).ConfigureAwait(false);
+            }
+        }
     }
 
     private static MtBenchmarkSampleSet SelectSamples(

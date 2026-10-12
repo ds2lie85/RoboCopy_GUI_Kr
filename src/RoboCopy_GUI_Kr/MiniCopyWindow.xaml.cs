@@ -46,7 +46,7 @@ public partial class MiniCopyWindow : Window
         }
 
         RouteTextBlock.Text = string.Format(CultureInfo.CurrentCulture, Text("MiniUiRunningFormat"), state.SourceName, state.DestinationName, state.TotalFiles);
-        StateTextBlock.Text = state.IsPaused
+        StateTextBlock.Text = state.HasFailedJobs ? Text("MiniUiFailedJobs") : state.IsPaused
             ? Text("MiniUiPaused")
             : string.Format(CultureInfo.CurrentCulture, Text("MiniUiRunningStateFormat"), state.OperationName);
         ProgressStatusTextBlock.Text = state.IsPaused
@@ -55,6 +55,15 @@ public partial class MiniCopyWindow : Window
         PauseResumeButton.Content = state.IsPaused ? "▶" : "∥";
         PauseResumeButton.ToolTip = state.IsPaused ? Text("MiniUiResume") : Text("MiniUiPause");
         PauseResumeButton.IsEnabled = state.CanPauseOrResume;
+        if (state.HasFailedJobs && !_completionHandled)
+        {
+            _completionHandled = true;
+            _openingAdvancedSettings = true;
+            _refreshTimer.Stop();
+            _mainWindow.ShowErrorManagementUi();
+            Close();
+            return;
+        }
         if (state.IsCompleted && !_completionHandled)
         {
             _completionHandled = true;
